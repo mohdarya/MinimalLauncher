@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">MinimalLauncher</string>
+    <string name="all">All</string>
+    <string name="restricted">Restricted</string>
+</resources>
