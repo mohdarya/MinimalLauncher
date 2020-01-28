@@ -1,7 +1,8 @@
 package com.minimallauncher;
 
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
+import android.content.pm.ResolveInfo;
+import android.content.pm.ResolveInfo;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +18,7 @@ import java.util.List;
 public class all_apps_recycler_adapter  extends RecyclerView.Adapter<all_apps_recycler_adapter.ViewHolder>
 {
 
-   List<ApplicationInfo> packages;
+   List<ResolveInfo> packages;
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
     {
 
@@ -61,12 +62,12 @@ public class all_apps_recycler_adapter  extends RecyclerView.Adapter<all_apps_re
     public void onBindViewHolder(@NonNull all_apps_recycler_adapter.ViewHolder holder, int position)
     {
 
-            ApplicationInfo data = this.packages.get(position);
-            holder.applicationName.setText(MainActivity.getApplicationName(data));
+            ResolveInfo data = this.packages.get(position);
+            holder.applicationName.setText(data.activityInfo.loadLabel(MainActivity.context.getPackageManager()).toString());
 
     }
 
-    all_apps_recycler_adapter(List<ApplicationInfo> data)
+    all_apps_recycler_adapter(List<ResolveInfo> data)
     {
         this.packages = data;
     }

@@ -1,8 +1,10 @@
 package com.minimallauncher;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -134,13 +136,17 @@ public class all_apps extends Fragment
         void onFragmentInteraction(Uri uri);
     }
 
-    List<ApplicationInfo> getApplicatons()
+    List<ResolveInfo> getApplicatons()
     {
       //  List<ApplicationInfo> noneSystemApps;
 
 
-        List<ApplicationInfo> allApplications = getContext().getPackageManager().getInstalledApplications(PackageManager.GET_META_DATA);
-        for(int i = 0; i < allApplications.size(); i++)
+        Intent intent = new Intent(Intent.ACTION_MAIN, null);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+
+
+        List<ResolveInfo> allApplications = getContext().getApplicationContext().getPackageManager().queryIntentActivities(intent,0);
+       /* for(int i = 0; i < allApplications.size(); i++)
         {
             if(!MainActivity.isSystemPackage(allApplications.get(i)))
             {
@@ -148,6 +154,8 @@ public class all_apps extends Fragment
             }
 
         }
+
+        */
         return allApplications;
     }
 }
