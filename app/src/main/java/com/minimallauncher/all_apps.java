@@ -92,8 +92,7 @@ public class all_apps extends Fragment
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
     {
         RecyclerView collectionrv = (RecyclerView) view.findViewById(R.id.all_apps_recycler_view);
-
-        adapter = new all_apps_recycler_adapter(getApplicatons());
+        adapter = new all_apps_recycler_adapter();
         collectionrv.setAdapter(adapter);
         collectionrv.setLayoutManager(new GridLayoutManager(getContext(), 1));
     }
@@ -136,26 +135,5 @@ public class all_apps extends Fragment
         void onFragmentInteraction(Uri uri);
     }
 
-    List<ResolveInfo> getApplicatons()
-    {
-      //  List<ApplicationInfo> noneSystemApps;
 
-
-        Intent intent = new Intent(Intent.ACTION_MAIN, null);
-        intent.addCategory(Intent.CATEGORY_LAUNCHER);
-
-
-        List<ResolveInfo> allApplications = getContext().getApplicationContext().getPackageManager().queryIntentActivities(intent,0);
-       /* for(int i = 0; i < allApplications.size(); i++)
-        {
-            if(!MainActivity.isSystemPackage(allApplications.get(i)))
-            {
-               allApplications.remove(allApplications.get(i));
-            }
-
-        }
-
-        */
-        return allApplications;
-    }
 }

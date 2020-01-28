@@ -7,12 +7,17 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -29,9 +34,9 @@ public class landing_page extends Fragment
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+
+    landing_page_recycler_adapter adapter;
+    static landing_page_recycler_adapter copyOfAdapter;
 
     private OnFragmentInteractionListener mListener;
 
@@ -63,11 +68,6 @@ public class landing_page extends Fragment
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null)
-        {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -95,6 +95,13 @@ public class landing_page extends Fragment
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState)
     {
+        RecyclerView deckrv = (RecyclerView) view.findViewById(R.id.regular_apps_recycler);
+
+        adapter = new landing_page_recycler_adapter(getApps());
+        deckrv.setAdapter(adapter);
+        setCopyOfAdapter();
+        deckrv.setLayoutManager(new GridLayoutManager(getContext(), 1));
+
         Button allApps = view.findViewById(R.id.all_button);
         allApps.setOnClickListener(new View.OnClickListener()
         {
@@ -104,6 +111,11 @@ public class landing_page extends Fragment
              Navigation.findNavController(view).navigate(landing_pageDirections.actionLandingPageToAllApps());
             }
         });
+    }
+
+    private void setCopyOfAdapter()
+    {
+        copyOfAdapter = adapter;
     }
 
 
@@ -128,5 +140,18 @@ public class landing_page extends Fragment
     {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    List<App> getApps()
+    {
+        List<App> regularApps = new ArrayList<>();
+        for(int i = 0; i < MainActivity.allApplications.size(); i++)
+        {
+            if(MainActivity.allApplications.get(i).isRegular())
+            {
+                regularApps.add(MainActivity.allApplications.get(i));
+            }
+        }
+        return regularApps;
     }
 }
