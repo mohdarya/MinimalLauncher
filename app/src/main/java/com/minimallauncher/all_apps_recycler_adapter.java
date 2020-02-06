@@ -13,42 +13,51 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 import java.util.List;
-
-public class all_apps_recycler_adapter  extends RecyclerView.Adapter<all_apps_recycler_adapter.ViewHolder>
+public class all_apps_recycler_adapter extends RecyclerView.Adapter<all_apps_recycler_adapter.ViewHolder>
 {
 
-   List<App> packages;
+    List<App> packages;
+    private OnItemClickListener mListener;
+    public interface OnItemClickListener {
+        void onAppClicked(int position);
+    }
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        mListener = listener;
+    }
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
     {
 
         public TextView applicationName;
         public ImageView restrictedSelected;
         public ImageView regularSelected;
-        public ViewHolder(final View itemView)
+
+        public ViewHolder(final View itemView, final OnItemClickListener listener)
         {
             super(itemView);
-
             applicationName = (TextView) itemView.findViewById(R.id.all_apps_items_text);
+            applicationName.setTypeface(MainActivity.font);
             restrictedSelected = (ImageView) itemView.findViewById(R.id.app_item_restricted_select);
             regularSelected = (ImageView) itemView.findViewById(R.id.app_item_regular_usage_select);
+            //TODO: cant remove from restricted until a week has passed since it was added
             restrictedSelected.setOnClickListener(new View.OnClickListener()
             {
                 @Override
                 public void onClick(View v)
                 {
-                    if(MainActivity.allApplications.get(getAdapterPosition()).isRestricted())
+                    if (MainActivity.allApplications.get(getAdapterPosition()).isRestricted())
                     {
-                        Drawable d = itemView.getContext().getResources().getDrawable(android.R.drawable.checkbox_off_background);
+                        Drawable d = itemView.getContext().getResources().getDrawable(R.drawable.box_two);
                         restrictedSelected.setImageDrawable(d);
                         MainActivity.allApplications.get(getAdapterPosition()).setRestricted(false);
 
-                    }
-                    else
+
+                    } else
                     {
 
-                        Drawable d = itemView.getContext().getResources().getDrawable(android.R.drawable.checkbox_on_background);
+                        Drawable d = itemView.getContext().getResources().getDrawable(R.drawable.cross_two);
                         restrictedSelected.setImageDrawable(d);
                         MainActivity.allApplications.get(getAdapterPosition()).setRestricted(true);
+
                     }
 
                 }
@@ -59,22 +68,38 @@ public class all_apps_recycler_adapter  extends RecyclerView.Adapter<all_apps_re
                 @Override
                 public void onClick(View v)
                 {
-                    if(MainActivity.allApplications.get(getAdapterPosition()).isRegular())
+                    if (MainActivity.allApplications.get(getAdapterPosition()).isRegular())
                     {
-                        Drawable d = itemView.getContext().getResources().getDrawable(android.R.drawable.btn_star_big_off);
+                        Drawable d = itemView.getContext().getResources().getDrawable(R.drawable.box_two);
                         regularSelected.setImageDrawable(d);
                         MainActivity.allApplications.get(getAdapterPosition()).setRegular(false);
+
                         landing_page.copyOfAdapter.notifyItemChanged(getAdapterPosition());
 
-                    }
-                    else
+                    } else
                     {
 
-                        Drawable d = itemView.getContext().getResources().getDrawable(android.R.drawable.btn_star_big_on);
-                        regularSelected.setImageDrawable(d);
+                        Drawable d = itemView.getContext().getResources().getDrawable(R.drawable.plus_two);
+                     regularSelected.setImageDrawable(d);
                         MainActivity.allApplications.get(getAdapterPosition()).setRegular(true);
+
                         landing_page.copyOfAdapter.notifyItemChanged(getAdapterPosition());
                     }
+                }
+            });
+
+            applicationName.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    if (listener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            listener.onAppClicked(position);
+                        }
+                    }
+
                 }
             });
         }
@@ -84,12 +109,14 @@ public class all_apps_recycler_adapter  extends RecyclerView.Adapter<all_apps_re
         {
 
         }
+
         @Override
         public boolean onLongClick(View v)
         {
             return false;
         }
     }
+
     @NonNull
     @Override
     public all_apps_recycler_adapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
@@ -100,7 +127,7 @@ public class all_apps_recycler_adapter  extends RecyclerView.Adapter<all_apps_re
 
         View collectionView = inflater.inflate(R.layout.all_apps_item, parent, false);
 
-        all_apps_recycler_adapter.ViewHolder viewholder = new all_apps_recycler_adapter.ViewHolder(collectionView);
+        all_apps_recycler_adapter.ViewHolder viewholder = new all_apps_recycler_adapter.ViewHolder(collectionView, mListener);
 
         return viewholder;
     }
@@ -109,16 +136,17 @@ public class all_apps_recycler_adapter  extends RecyclerView.Adapter<all_apps_re
     public void onBindViewHolder(@NonNull all_apps_recycler_adapter.ViewHolder holder, int position)
     {
 
-            App data = MainActivity.allApplications.get(position);
-            holder.applicationName.setText(data.getApplicationName());
-            if(MainActivity.allApplications.get(position).isRegular())
-            {
-                Drawable d = holder.itemView.getContext().getResources().getDrawable(android.R.drawable.btn_star_big_on);
-                holder.regularSelected.setImageDrawable(d);
-            }
-        if(MainActivity.allApplications.get(position).isRestricted())
+        App data = MainActivity.allApplications.get(position);
+        holder.applicationName.setText(data.getApplicationName());
+
+        if (MainActivity.allApplications.get(position).isRegular())
         {
-            Drawable d = holder.itemView.getContext().getResources().getDrawable(android.R.drawable.checkbox_on_background);
+            Drawable d = holder.itemView.getContext().getResources().getDrawable(R.drawable.plus_two);
+            holder.regularSelected.setImageDrawable(d);
+        }
+        if (MainActivity.allApplications.get(position).isRestricted())
+        {
+            Drawable d = holder.itemView.getContext().getResources().getDrawable(R.drawable.cross_two);
             holder.restrictedSelected.setImageDrawable(d);
         }
 

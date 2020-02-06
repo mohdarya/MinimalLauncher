@@ -1,6 +1,7 @@
 package com.minimallauncher;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,17 +16,39 @@ public class landing_page_recycler_adapter extends RecyclerView.Adapter<landing_
 {
 
     List<App> data;
-
+    private OnItemClickListener mListener;
+    public interface OnItemClickListener {
+        void onAppClicked(int position);
+    }
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        mListener = listener;
+    }
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
     {
 
 
         public TextView appName;
-        public ViewHolder(@NonNull View itemView)
+        public ViewHolder(@NonNull View itemView, final OnItemClickListener listener)
         {
             super(itemView);
 
             appName = itemView.findViewById(R.id.all_apps_items_text);
+            appName.setTypeface(MainActivity.font);
+
+            appName.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    if (listener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            listener.onAppClicked(position);
+                        }
+                    }
+
+                }
+            });
 
 
         }
@@ -51,7 +74,7 @@ public class landing_page_recycler_adapter extends RecyclerView.Adapter<landing_
 
         View collectionView = inflater.inflate(R.layout.regular_apps_recycler_item, parent, false);
 
-        landing_page_recycler_adapter.ViewHolder viewholder = new landing_page_recycler_adapter.ViewHolder(collectionView);
+        landing_page_recycler_adapter.ViewHolder viewholder = new landing_page_recycler_adapter.ViewHolder(collectionView, mListener);
 
         return viewholder;
     }

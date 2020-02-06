@@ -20,13 +20,13 @@
     </item>
     -->
     <item
-        android:end="10dp"
+        android:end="30dp"
         android:start="10dp"
         android:background="@android:color/white">
     <shape
         android:shape="rectangle"
         android:useLevel="false">
-        <stroke android:width="3dp"
+        <stroke android:width="5px"
             android:color="@android:color/black"/>
     </shape>
 </item>

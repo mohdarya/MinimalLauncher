@@ -4,44 +4,46 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/linearLayout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:paddingTop="5sp"
+    android:paddingBottom="5sp">
 
     <TextView
         android:id="@+id/all_apps_items_text"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@drawable/app_border"
-        android:textAlignment="center"
+        android:background="@drawable/app_border_selection"
+        android:paddingStart="15sp"
+        android:paddingTop="3dp"
+        android:textAlignment="textStart"
         android:textColor="@android:color/black"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/app_item_regular_usage_select"
-        app:layout_constraintStart_toEndOf="@+id/app_item_restricted_select"
+        app:layout_constraintEnd_toStartOf="@+id/app_item_restricted_select"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/app_item_regular_usage_select"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="9dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginEnd="5dp"
-        android:layout_marginBottom="10dp"
         android:clickable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/app_item_restricted_select"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/btn_star_big_off" />
+        app:srcCompat="@drawable/box_two" />
 
     <ImageView
         android:id="@+id/app_item_restricted_select"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="9dp"
-        android:layout_marginBottom="10dp"
+        android:layout_width="40dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="5dp"
+        android:clickable="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/app_item_regular_usage_select"
+        app:layout_constraintStart_toEndOf="@+id/all_apps_items_text"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/checkbox_off_background"
-        android:clickable="true"/>
+        app:srcCompat="@drawable/box_two" />
 </androidx.constraintlayout.widget.ConstraintLayout>

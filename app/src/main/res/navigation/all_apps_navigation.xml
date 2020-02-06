@@ -13,10 +13,18 @@
         <action
             android:id="@+id/action_landing_page_to_all_apps"
             app:destination="@id/all_apps" />
+        <action
+            android:id="@+id/action_landing_to_restricted"
+            app:destination="@id/restricted_apps" />
     </fragment>
     <fragment
         android:id="@+id/all_apps"
         android:name="com.minimallauncher.all_apps"
         android:label="all_apps"
         tools:layout="@layout/all_apps"/>
+    <fragment
+        android:id="@+id/restricted_apps"
+        android:name="com.minimallauncher.restricted_apps"
+        android:label="restricted_apps"
+        tools:layout="@layout/restricted_page"/>
 </navigation>

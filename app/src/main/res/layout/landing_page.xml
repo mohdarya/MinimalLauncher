@@ -5,40 +5,43 @@
     android:id="@+id/landing_page_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@android:color/white">
+
 
     <TextClock
-        android:id="@+id/clock"
+        android:id="@+id/landing_page_clock"
         android:layout_width="230dp"
         android:layout_height="40dp"
-        android:layout_marginStart="10dp"
         android:layout_marginBottom="175dp"
+        android:background="@drawable/clock_border"
+        android:paddingStart="14sp"
+        android:textAlignment="textStart"
+        android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/regular_apps_recycler"
         app:layout_constraintEnd_toStartOf="@+id/all_button"
         app:layout_constraintHorizontal_bias="0.162"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.625" />
-
+        app:layout_constraintVertical_bias="0.611" />
 
     <Button
         android:id="@+id/all_button"
-        android:layout_width="130dp"
-        android:layout_height="100dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:layout_marginStart="32dp"
-        android:layout_marginEnd="9dp"
-        android:text="@string/all"
-        app:layout_constraintBottom_toTopOf="@+id/Restricted_button"
+        android:background="@drawable/all"
+        app:layout_constraintBottom_toTopOf="@+id/restricted_button"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/clock"
+        app:layout_constraintStart_toEndOf="@+id/landing_page_clock"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.32999998" />
 
     <Button
-        android:id="@+id/Restricted_button"
-        android:layout_width="130dp"
-        android:layout_height="100dp"
-        android:text="@string/restricted"
+        android:id="@+id/restricted_button"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:background="@drawable/restricted"
         app:layout_constraintBottom_toTopOf="@+id/regular_apps_recycler"
         app:layout_constraintEnd_toEndOf="@+id/all_button"
         app:layout_constraintHorizontal_bias="0.0"
@@ -47,6 +50,7 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/regular_apps_recycler"
+        android:background="@android:color/white"
         android:layout_width="0dp"
         android:layout_height="449dp"
         android:layout_marginStart="1dp"
@@ -65,8 +69,9 @@
         android:layout_marginTop="10dp"
         android:layout_marginBottom="90dp"
         android:text="TextView"
+        android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/regular_apps_recycler"
-        app:layout_constraintEnd_toEndOf="@+id/clock"
-        app:layout_constraintStart_toStartOf="@+id/clock"
-        app:layout_constraintTop_toBottomOf="@+id/clock" />
+        app:layout_constraintEnd_toEndOf="@+id/landing_page_clock"
+        app:layout_constraintStart_toStartOf="@+id/landing_page_clock"
+        app:layout_constraintTop_toBottomOf="@+id/landing_page_clock" />
 </androidx.constraintlayout.widget.ConstraintLayout>

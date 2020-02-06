@@ -1,6 +1,8 @@
 package com.minimallauncher;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -10,14 +12,21 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextClock;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.time.Clock;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,19 +36,18 @@ import java.util.List;
  * Use the {@link landing_page#newInstance} factory method to
  * create an instance of this fragment.
  */
+
+//TODO: add the timer to show the phone usage time, currently set to invisible
 public class landing_page extends Fragment
 {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+
 
 
     landing_page_recycler_adapter adapter;
     static landing_page_recycler_adapter copyOfAdapter;
-
+    static boolean restricedPressed = false;
     private OnFragmentInteractionListener mListener;
-
+    private List<App> regularApps;
     public landing_page()
     {
         // Required empty public constructor
@@ -53,14 +61,11 @@ public class landing_page extends Fragment
      * @param param2 Parameter 2.
      * @return A new instance of fragment landing_page.
      */
-    // TODO: Rename and change types and number of parameters
+
     public static landing_page newInstance(String param1, String param2)
     {
         landing_page fragment = new landing_page();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
+
         return fragment;
     }
 
@@ -77,7 +82,6 @@ public class landing_page extends Fragment
         return inflater.inflate(R.layout.landing_page, container, false);
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri)
     {
         if (mListener != null)
@@ -102,6 +106,20 @@ public class landing_page extends Fragment
         setCopyOfAdapter();
         deckrv.setLayoutManager(new GridLayoutManager(getContext(), 1));
 
+        adapter.setOnItemClickListener(new landing_page_recycler_adapter.OnItemClickListener()
+        {
+            @Override
+            public void onAppClicked(int position)
+            {
+
+
+                    Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(regularApps.get(position).getApp().activityInfo.packageName);
+                    getContext().startActivity(intent);
+
+
+
+            }
+        });
         Button allApps = view.findViewById(R.id.all_button);
         allApps.setOnClickListener(new View.OnClickListener()
         {
@@ -111,6 +129,38 @@ public class landing_page extends Fragment
              Navigation.findNavController(view).navigate(landing_pageDirections.actionLandingPageToAllApps());
             }
         });
+        final Button restrictedApps = view.findViewById(R.id.restricted_button);
+        restrictedApps.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Random random = new Random();
+                int waitTime = random.nextInt(10000 - 5000) + 5000;
+
+                //TODO: try to recreate the error happening when you try to launch the restriced apps
+                if(!restricedPressed)
+                {
+                    restricedPressed = true;
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+
+                            Navigation.findNavController(view).navigate(landing_pageDirections.actionLandingToRestricted());
+                            restricedPressed = false;
+
+                        }
+                    }, waitTime);
+                }
+
+            }
+        });
+
+        TextClock clock = view.findViewById(R.id.landing_page_clock);
+        clock.setTypeface(MainActivity.font);
     }
 
     private void setCopyOfAdapter()
@@ -138,13 +188,27 @@ public class landing_page extends Fragment
      */
     public interface OnFragmentInteractionListener
     {
-        // TODO: Update argument type and name
+
         void onFragmentInteraction(Uri uri);
     }
 
     List<App> getApps()
     {
-        List<App> regularApps = new ArrayList<>();
+        regularApps  = new ArrayList<App>(){
+        public boolean add(App data)
+        {
+            super.add(data);
+            Collections.sort(regularApps, new Comparator<App>()
+            {
+                @Override
+                public int compare(App o1, App o2)
+                {
+                    return o1.getApplicationName().toLowerCase().compareTo(o2.getApplicationName().toLowerCase());
+                }
+            });
+            return true;
+        }
+    };
         for(int i = 0; i < MainActivity.allApplications.size(); i++)
         {
             if(MainActivity.allApplications.get(i).isRegular())

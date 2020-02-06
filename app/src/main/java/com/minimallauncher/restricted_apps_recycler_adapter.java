@@ -17,6 +17,13 @@ public class restricted_apps_recycler_adapter extends RecyclerView.Adapter<restr
 
     private final List<App> data;
 
+    private OnItemClickListener mListener;
+    public interface OnItemClickListener {
+        void onAppClicked(int position);
+    }
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        mListener = listener;
+    }
     @NonNull
     @Override
     public restricted_apps_recycler_adapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
@@ -24,9 +31,9 @@ public class restricted_apps_recycler_adapter extends RecyclerView.Adapter<restr
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
 
-        View collectionView = inflater.inflate(R.layout.regular_apps_recycler_item, parent, false);
+        View collectionView = inflater.inflate(R.layout.restricted_app_item, parent, false);
 
-        restricted_apps_recycler_adapter.ViewHolder viewholder = new restricted_apps_recycler_adapter.ViewHolder(collectionView);
+        restricted_apps_recycler_adapter.ViewHolder viewholder = new restricted_apps_recycler_adapter.ViewHolder(collectionView, mListener);
 
         return viewholder;
     }
@@ -40,6 +47,7 @@ public class restricted_apps_recycler_adapter extends RecyclerView.Adapter<restr
     public void onBindViewHolder(@NonNull restricted_apps_recycler_adapter.ViewHolder holder, int position)
     {
         holder.appName.setText(data.get(position).getApplicationName());
+
     }
 
     @Override
@@ -53,12 +61,26 @@ public class restricted_apps_recycler_adapter extends RecyclerView.Adapter<restr
 
 
         public TextView appName;
-        public ViewHolder(@NonNull View itemView)
+        public ViewHolder(@NonNull View itemView, final OnItemClickListener listener)
         {
             super(itemView);
+            appName = itemView.findViewById(R.id.restriected_app_item_text);
+            appName.setTypeface(MainActivity.font);
 
-            appName = itemView.findViewById(R.id.all_apps_items_text);
+            appName.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    if (listener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            listener.onAppClicked(position);
+                        }
+                    }
 
+                }
+            });
 
         }
 

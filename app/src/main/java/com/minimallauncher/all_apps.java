@@ -32,16 +32,11 @@ import java.util.ListIterator;
  * Use the {@link all_apps#newInstance} factory method to
  * create an instance of this fragment.
  */
+
+//TODO: add a preset profile
+//TODO: have the profiles be activated based on location
 public class all_apps extends Fragment
 {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private OnFragmentInteractionListener mListener;
 
@@ -51,22 +46,11 @@ public class all_apps extends Fragment
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment all_apps.
-     */
-    // TODO: Rename and change types and number of parameters
+
+
     public static all_apps newInstance(String param1, String param2)
     {
         all_apps fragment = new all_apps();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
         return fragment;
     }
 
@@ -74,11 +58,7 @@ public class all_apps extends Fragment
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null)
-        {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
     }
 
     @Override
@@ -95,8 +75,18 @@ public class all_apps extends Fragment
         adapter = new all_apps_recycler_adapter();
         collectionrv.setAdapter(adapter);
         collectionrv.setLayoutManager(new GridLayoutManager(getContext(), 1));
+
+        adapter.setOnItemClickListener(new all_apps_recycler_adapter.OnItemClickListener()
+        {
+            @Override
+            public void onAppClicked(int position)
+            {
+
+                Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(MainActivity.allApplications.get(position).getApp().activityInfo.packageName);
+                getContext().startActivity(intent);
+            }
+        });
     }
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri)
     {
         if (mListener != null)
@@ -119,19 +109,8 @@ public class all_apps extends Fragment
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener
     {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 

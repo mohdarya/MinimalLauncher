@@ -6,15 +6,13 @@ public class App
 {
     private String applicationName;
     private ResolveInfo app;
-    private boolean restricted;
-    private boolean regular;
+    private boolean restricted = false;
+    private boolean regular = false;
 
-    public App(String applicationName, ResolveInfo app, boolean restricted, boolean regular)
+    public App(String applicationName, ResolveInfo app)
     {
         this.applicationName = applicationName;
         this.app = app;
-        this.restricted = restricted;
-        this.regular = regular;
     }
 
     public String getApplicationName()
