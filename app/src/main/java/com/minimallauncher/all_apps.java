@@ -96,7 +96,7 @@ public class all_apps extends Fragment
                         @Override
                         public void run()
                         {
-                            Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(MainActivity.allApplications.get(appPosition).getApp().activityInfo.packageName);
+                            Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(MainActivity.allApplications.get(appPosition).getPackageName());
                             intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                             getContext().startActivity(intent);
@@ -127,7 +127,7 @@ public class all_apps extends Fragment
                 }
                 else
                 {
-                    Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(MainActivity.allApplications.get(position).getApp().activityInfo.packageName);
+                    Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(MainActivity.allApplications.get(position).getPackageName());
                     intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     getContext().startActivity(intent);
                 }

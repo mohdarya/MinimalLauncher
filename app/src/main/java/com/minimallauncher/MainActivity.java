@@ -2,6 +2,7 @@ package com.minimallauncher;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ResolveInfo;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -9,16 +10,23 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 
-//TODO: make it so it saves info between updates
+
 public class MainActivity extends AppCompatActivity
 {
 
+    public static String SHARED_PREFS = "sharedPrefs";
+    public static String DATA = "data1";
     private static boolean activityVisible;
     static int fragmentLaunched = 0;
     static Context context;
@@ -47,8 +55,9 @@ public class MainActivity extends AppCompatActivity
     {
 
         super.onCreate(savedInstanceState);
-        getApplications();
         context = this;
+       loadData();
+        getApplications();
         font = Typeface.createFromAsset(context.getAssets(), "fonts/Helvetica.ttc");
         setContentView(R.layout.content_main);
 
@@ -76,7 +85,7 @@ public class MainActivity extends AppCompatActivity
 
             for (int i = 0; i < allApps.size(); i++)
             {
-                App temp = new App(allApps.get(i).activityInfo.loadLabel(getPackageManager()).toString(), allApps.get(i));
+                App temp = new App(allApps.get(i).activityInfo.loadLabel(getPackageManager()).toString(), allApps.get(i).activityInfo.packageName);
                 if(!allApplications.contains(temp))
                 {
                     allApplications.add(temp);
@@ -111,10 +120,30 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-public static void launchRestrictedApp()
+public static void saveData()
 {
+    SharedPreferences sharedPreferences = context.getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+    SharedPreferences.Editor editor = sharedPreferences.edit();
+    Gson gson = new Gson();
+    Type appListType = new TypeToken<ArrayList<App>>(){}.getType();
+    String json = gson.toJson(MainActivity.allApplications, appListType);
+    editor.putString(DATA, json);
+    editor.apply();
 
 }
+
+public static void loadData()
+{
+    SharedPreferences sharedPreferences = context.getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+    Gson gson = new Gson();
+    String json = sharedPreferences.getString(DATA,"");
+    Type appListType = new TypeToken<ArrayList<App>>(){}.getType();
+    if(!json.equals(""))
+    {
+        MainActivity.allApplications = gson.fromJson(json, appListType);
+    }
+}
+
 
 
 }

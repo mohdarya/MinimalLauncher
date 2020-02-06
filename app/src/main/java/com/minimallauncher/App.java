@@ -5,25 +5,44 @@ import android.content.pm.ResolveInfo;
 public class App
 {
     private String applicationName;
-    private ResolveInfo app;
+
+    private String packageName;
     private boolean restricted = false;
     private boolean regular = false;
+    private ResolveInfo app;
+
 
     public App(String applicationName, ResolveInfo app)
     {
         this.applicationName = applicationName;
         this.app = app;
-    }
 
-    public String getApplicationName()
-    {
-        return applicationName;
     }
 
     public ResolveInfo getApp()
     {
         return app;
     }
+
+    public void setApp(ResolveInfo app)
+    {
+        this.app = app;
+    }
+
+
+    public App(String applicationName, String packageName)
+    {
+        this.applicationName = applicationName;
+        this.packageName = packageName;
+    }
+
+
+    public String getApplicationName()
+    {
+        return applicationName;
+    }
+
+
 
     public boolean isRestricted()
     {
@@ -40,10 +59,7 @@ public class App
         this.applicationName = applicationName;
     }
 
-    public void setApp(ResolveInfo app)
-    {
-        this.app = app;
-    }
+
 
     public void setRestricted(boolean restricted)
     {
@@ -71,5 +87,15 @@ public class App
     @Override
     public int hashCode() {
         return applicationName.hashCode();
+    }
+
+    public String getPackageName()
+    {
+        return packageName;
+    }
+
+    public void setPackageName(String packageName)
+    {
+        this.packageName = packageName;
     }
 }

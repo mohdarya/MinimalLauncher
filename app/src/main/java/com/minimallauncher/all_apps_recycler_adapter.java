@@ -52,12 +52,14 @@ public class all_apps_recycler_adapter extends RecyclerView.Adapter<all_apps_rec
                     if (MainActivity.allApplications.get(position).isRestricted())
                     {
                         MainActivity.allApplications.get(position).setRestricted(false);
+                        MainActivity.saveData();
                         all_apps.adapter.notifyItemChanged(getAdapterPosition());
 
 
                     } else
                     {
                         MainActivity.allApplications.get(position).setRestricted(true);
+                        MainActivity.saveData();
                         all_apps.adapter.notifyItemChanged(getAdapterPosition());
                     }
 
@@ -72,6 +74,7 @@ public class all_apps_recycler_adapter extends RecyclerView.Adapter<all_apps_rec
                     if (MainActivity.allApplications.get(getAdapterPosition()).isRegular())
                     {
                         MainActivity.allApplications.get(getAdapterPosition()).setRegular(false);
+                        MainActivity.saveData();
                         landing_page.copyOfAdapter.notifyItemChanged(getAdapterPosition());
                         all_apps.adapter.notifyItemChanged(getAdapterPosition());
 
@@ -79,6 +82,7 @@ public class all_apps_recycler_adapter extends RecyclerView.Adapter<all_apps_rec
                     {
 
                         MainActivity.allApplications.get(getAdapterPosition()).setRegular(true);
+                        MainActivity.saveData();
                         landing_page.copyOfAdapter.notifyItemChanged(getAdapterPosition());
                         all_apps.adapter.notifyItemChanged(getAdapterPosition());
                     }

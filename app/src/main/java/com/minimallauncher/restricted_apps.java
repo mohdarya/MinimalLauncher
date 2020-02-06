@@ -111,11 +111,11 @@ public class restricted_apps extends Fragment
                     @Override
                     public void run()
                     {
-                        Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(restrictedApps.get(appPosition).getApp().activityInfo.packageName);
+                        Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(restrictedApps.get(appPosition).getPackageName());
                         intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                         getContext().startActivity(intent);
-                        final String packageName = restrictedApps.get(appPosition).getApp().activityInfo.packageName;
+                        final String packageName = restrictedApps.get(appPosition).getPackageName();
                         int appExitWaitTime = random.nextInt(600000 - 300000) + 300000;
                         Handler handler = new Handler();
                         handler.postDelayed(new Runnable()
