@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,8 +40,7 @@ public class all_apps extends Fragment
 {
 
     private OnFragmentInteractionListener mListener;
-
-    private all_apps_recycler_adapter adapter;
+    static all_apps_recycler_adapter adapter;
     public all_apps()
     {
         // Required empty public constructor
@@ -75,7 +75,7 @@ public class all_apps extends Fragment
         adapter = new all_apps_recycler_adapter();
         collectionrv.setAdapter(adapter);
         collectionrv.setLayoutManager(new GridLayoutManager(getContext(), 1));
-
+        ((SimpleItemAnimator)(collectionrv.getItemAnimator())).setSupportsChangeAnimations(false);
         adapter.setOnItemClickListener(new all_apps_recycler_adapter.OnItemClickListener()
         {
             @Override
@@ -83,6 +83,7 @@ public class all_apps extends Fragment
             {
 
                 Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(MainActivity.allApplications.get(position).getApp().activityInfo.packageName);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 getContext().startActivity(intent);
             }
         });
@@ -113,6 +114,7 @@ public class all_apps extends Fragment
     {
         void onFragmentInteraction(Uri uri);
     }
+
 
 
 }

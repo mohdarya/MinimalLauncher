@@ -17,11 +17,14 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity
 {
 
+    private static boolean activityVisible;
+    static int fragmentLaunched = 0;
     static Context context;
     static Typeface font ;
     static List<App> allApplications = new ArrayList<App>(){
         public boolean add(App data)
         {
+
             super.add(data);
             Collections.sort(allApplications, new Comparator<App>()
             {
@@ -33,7 +36,10 @@ public class MainActivity extends AppCompatActivity
             });
             return true;
         }
+
+
     };
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
@@ -46,15 +52,16 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+
+
     @Override
     public void onBackPressed()
     {
-        if (getSupportFragmentManager().getBackStackEntryCount() == 1){
-            finish();
-        }
-        else {
+        if (fragmentLaunched > 0){
+            fragmentLaunched--;
             super.onBackPressed();
         }
+
     }
 
     public void getApplications()
@@ -64,11 +71,41 @@ public class MainActivity extends AppCompatActivity
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
        List< ResolveInfo> allApps = getApplicationContext().getPackageManager().queryIntentActivities(intent,0);
 
-       for(int i = 0; i < allApps.size(); i++)
-       {
-           allApplications.add(new App(allApps.get(i).activityInfo.loadLabel(getPackageManager()).toString(),allApps.get(i)));
-       }
 
+            for (int i = 0; i < allApps.size(); i++)
+            {
+                App temp = new App(allApps.get(i).activityInfo.loadLabel(getPackageManager()).toString(), allApps.get(i));
+                if(!allApplications.contains(temp))
+                {
+                    allApplications.add(temp);
+                }
+            }
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MainActivity.activityResumed();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MainActivity.activityPaused();
+    }
+
+    public static boolean isActivityVisible() {
+        return activityVisible;
+    }
+
+    public static void activityResumed() {
+        activityVisible = true;
+    }
+
+    public static void activityPaused() {
+        activityVisible = false;
     }
 
 

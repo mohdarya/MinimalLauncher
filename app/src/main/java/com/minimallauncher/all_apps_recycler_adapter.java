@@ -2,11 +2,13 @@ package com.minimallauncher;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -44,20 +46,19 @@ public class all_apps_recycler_adapter extends RecyclerView.Adapter<all_apps_rec
                 @Override
                 public void onClick(View v)
                 {
-                    if (MainActivity.allApplications.get(getAdapterPosition()).isRestricted())
+
+                    int position = getAdapterPosition();
+
+                    if (MainActivity.allApplications.get(position).isRestricted())
                     {
-                        Drawable d = itemView.getContext().getResources().getDrawable(R.drawable.box_two);
-                        restrictedSelected.setImageDrawable(d);
-                        MainActivity.allApplications.get(getAdapterPosition()).setRestricted(false);
+                        MainActivity.allApplications.get(position).setRestricted(false);
+                        all_apps.adapter.notifyItemChanged(getAdapterPosition());
 
 
                     } else
                     {
-
-                        Drawable d = itemView.getContext().getResources().getDrawable(R.drawable.cross_two);
-                        restrictedSelected.setImageDrawable(d);
-                        MainActivity.allApplications.get(getAdapterPosition()).setRestricted(true);
-
+                        MainActivity.allApplications.get(position).setRestricted(true);
+                        all_apps.adapter.notifyItemChanged(getAdapterPosition());
                     }
 
                 }
@@ -70,20 +71,16 @@ public class all_apps_recycler_adapter extends RecyclerView.Adapter<all_apps_rec
                 {
                     if (MainActivity.allApplications.get(getAdapterPosition()).isRegular())
                     {
-                        Drawable d = itemView.getContext().getResources().getDrawable(R.drawable.box_two);
-                        regularSelected.setImageDrawable(d);
                         MainActivity.allApplications.get(getAdapterPosition()).setRegular(false);
-
                         landing_page.copyOfAdapter.notifyItemChanged(getAdapterPosition());
+                        all_apps.adapter.notifyItemChanged(getAdapterPosition());
 
                     } else
                     {
 
-                        Drawable d = itemView.getContext().getResources().getDrawable(R.drawable.plus_two);
-                     regularSelected.setImageDrawable(d);
                         MainActivity.allApplications.get(getAdapterPosition()).setRegular(true);
-
                         landing_page.copyOfAdapter.notifyItemChanged(getAdapterPosition());
+                        all_apps.adapter.notifyItemChanged(getAdapterPosition());
                     }
                 }
             });
@@ -136,17 +133,28 @@ public class all_apps_recycler_adapter extends RecyclerView.Adapter<all_apps_rec
     public void onBindViewHolder(@NonNull all_apps_recycler_adapter.ViewHolder holder, int position)
     {
 
+
         App data = MainActivity.allApplications.get(position);
         holder.applicationName.setText(data.getApplicationName());
 
         if (MainActivity.allApplications.get(position).isRegular())
         {
-            Drawable d = holder.itemView.getContext().getResources().getDrawable(R.drawable.plus_two);
+            Drawable d = holder.itemView.getContext().getDrawable(R.drawable.plus_two);
+            holder.regularSelected.setImageDrawable(d);
+        }
+        if (!MainActivity.allApplications.get(position).isRegular())
+        {
+            Drawable d = holder.itemView.getContext().getDrawable(R.drawable.box_two);
             holder.regularSelected.setImageDrawable(d);
         }
         if (MainActivity.allApplications.get(position).isRestricted())
         {
-            Drawable d = holder.itemView.getContext().getResources().getDrawable(R.drawable.cross_two);
+            Drawable d = holder.itemView.getContext().getDrawable(R.drawable.cross_two);
+            holder.restrictedSelected.setImageDrawable(d);
+        }
+        if (!MainActivity.allApplications.get(position).isRestricted())
+        {
+            Drawable d = holder.itemView.getContext().getDrawable(R.drawable.box_two);
             holder.restrictedSelected.setImageDrawable(d);
         }
 

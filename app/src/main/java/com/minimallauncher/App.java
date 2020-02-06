@@ -54,4 +54,22 @@ public class App
     {
         this.regular = regular;
     }
+
+
+    @Override
+    public boolean equals(Object v) {
+        boolean retVal = false;
+
+        if (v instanceof App){
+            App ptr = (App) v;
+            retVal = ptr.applicationName.equals(this.applicationName);
+        }
+
+        return retVal;
+    }
+
+    @Override
+    public int hashCode() {
+        return applicationName.hashCode();
+    }
 }

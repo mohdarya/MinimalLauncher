@@ -111,9 +111,8 @@ public class landing_page extends Fragment
             @Override
             public void onAppClicked(int position)
             {
-
-
                     Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(regularApps.get(position).getApp().activityInfo.packageName);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     getContext().startActivity(intent);
 
 
@@ -126,7 +125,9 @@ public class landing_page extends Fragment
             @Override
             public void onClick(View v)
             {
+
              Navigation.findNavController(view).navigate(landing_pageDirections.actionLandingPageToAllApps());
+                MainActivity.fragmentLaunched++;
             }
         });
         final Button restrictedApps = view.findViewById(R.id.restricted_button);
@@ -150,6 +151,7 @@ public class landing_page extends Fragment
                         {
 
                             Navigation.findNavController(view).navigate(landing_pageDirections.actionLandingToRestricted());
+                            MainActivity.fragmentLaunched++;
                             restricedPressed = false;
 
                         }
@@ -194,6 +196,7 @@ public class landing_page extends Fragment
 
     List<App> getApps()
     {
+        MainActivity activity = (MainActivity)getActivity();
         regularApps  = new ArrayList<App>(){
         public boolean add(App data)
         {
@@ -209,11 +212,11 @@ public class landing_page extends Fragment
             return true;
         }
     };
-        for(int i = 0; i < MainActivity.allApplications.size(); i++)
+        for(int i = 0; i < activity.allApplications.size(); i++)
         {
-            if(MainActivity.allApplications.get(i).isRegular())
+            if(activity.allApplications.get(i).isRegular())
             {
-                regularApps.add(MainActivity.allApplications.get(i));
+                regularApps.add(activity.allApplications.get(i));
             }
         }
         return regularApps;

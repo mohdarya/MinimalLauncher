@@ -1,5 +1,7 @@
 package com.minimallauncher;
 
+import android.app.ActivityManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -39,7 +41,7 @@ public class restricted_apps extends Fragment
 
     restricted_apps_recycler_adapter adapter;
     static restricted_apps_recycler_adapter copyOfAdapter;
-    private  List<App> restrictedApps;
+    private List<App> restrictedApps;
 
     private OnFragmentInteractionListener mListener;
 
@@ -84,6 +86,9 @@ public class restricted_apps extends Fragment
         }
     }
 
+
+    //TODO: anytime restricted app is opened go to home
+    //TODO: go to home screen when thaat app is open otherwise dont
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState)
     {
         RecyclerView restrictedRV = (RecyclerView) view.findViewById(R.id.restricted_recyler_view);
@@ -99,7 +104,7 @@ public class restricted_apps extends Fragment
             {
                 final Random random = new Random();
                 int appLaunchWaitTime = random.nextInt(10000 - 5000) + 5000;
-               final int appPosition = position;
+                final int appPosition = position;
                 Handler handlerEnter = new Handler();
                 handlerEnter.postDelayed(new Runnable()
                 {
@@ -107,8 +112,10 @@ public class restricted_apps extends Fragment
                     public void run()
                     {
                         Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(restrictedApps.get(appPosition).getApp().activityInfo.packageName);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                         getContext().startActivity(intent);
-
+                        final String packageName = restrictedApps.get(appPosition).getApp().activityInfo.packageName;
                         int appExitWaitTime = random.nextInt(600000 - 300000) + 300000;
                         Handler handler = new Handler();
                         handler.postDelayed(new Runnable()
@@ -117,14 +124,20 @@ public class restricted_apps extends Fragment
                             public void run()
                             {
 
-                                Intent startMain = new Intent(Intent.ACTION_MAIN);
-                                startMain.addCategory(Intent.CATEGORY_HOME);
-                                startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(startMain);
-                                Toast.makeText(getContext(),"Get Back To Working!", Toast.LENGTH_LONG).show();
+
+                                    if(!MainActivity.isActivityVisible())
+                                    {
+                                        Intent startMain = new Intent(Intent.ACTION_MAIN);
+                                        startMain.addCategory(Intent.CATEGORY_HOME);
+                                        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        getActivity().onBackPressed();
+                                        startActivity(startMain);
+                                        Toast.makeText(getContext(), "Get Back To Working!", Toast.LENGTH_LONG).show();
+
+                                    }
 
                             }
-                        },appExitWaitTime);
+                        }, appExitWaitTime);
                     }
                 }, appLaunchWaitTime);
 
@@ -135,24 +148,25 @@ public class restricted_apps extends Fragment
 
     private List<App> getApps()
     {
-        restrictedApps = new ArrayList<App>(){
-        public boolean add(App data)
+        restrictedApps = new ArrayList<App>()
         {
-            super.add(data);
-            Collections.sort(restrictedApps, new Comparator<App>()
+            public boolean add(App data)
             {
-                @Override
-                public int compare(App o1, App o2)
+                super.add(data);
+                Collections.sort(restrictedApps, new Comparator<App>()
                 {
-                    return o1.getApplicationName().toLowerCase().compareTo(o2.getApplicationName().toLowerCase());
-                }
-            });
-            return true;
-        }
-    };
-        for(int i = 0; i < MainActivity.allApplications.size(); i++)
+                    @Override
+                    public int compare(App o1, App o2)
+                    {
+                        return o1.getApplicationName().toLowerCase().compareTo(o2.getApplicationName().toLowerCase());
+                    }
+                });
+                return true;
+            }
+        };
+        for (int i = 0; i < MainActivity.allApplications.size(); i++)
         {
-            if(MainActivity.allApplications.get(i).isRestricted())
+            if (MainActivity.allApplications.get(i).isRestricted())
             {
                 restrictedApps.add(MainActivity.allApplications.get(i));
             }
@@ -194,4 +208,6 @@ public class restricted_apps extends Fragment
 
         void onFragmentInteraction(Uri uri);
     }
+
+
 }
