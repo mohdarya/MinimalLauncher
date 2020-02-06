@@ -14,6 +14,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+
+//TODO: make it so it saves info between updates
 public class MainActivity extends AppCompatActivity
 {
 
@@ -109,7 +111,10 @@ public class MainActivity extends AppCompatActivity
     }
 
 
+public static void launchRestrictedApp()
+{
 
+}
 
 
 }

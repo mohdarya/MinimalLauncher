@@ -15,15 +15,18 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Random;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -82,9 +85,52 @@ public class all_apps extends Fragment
             public void onAppClicked(int position)
             {
 
-                Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(MainActivity.allApplications.get(position).getApp().activityInfo.packageName);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                getContext().startActivity(intent);
+                if(MainActivity.allApplications.get(position).isRestricted())
+                {
+                    final Random random = new Random();
+                    int appLaunchWaitTime = random.nextInt(10000 - 5000) + 5000;
+                    final int appPosition = position;
+                    Handler handlerEnter = new Handler();
+                    handlerEnter.postDelayed(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(MainActivity.allApplications.get(appPosition).getApp().activityInfo.packageName);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                            getContext().startActivity(intent);
+                            int appExitWaitTime = random.nextInt(600000 - 300000) + 300000;
+                            Handler handler = new Handler();
+                            handler.postDelayed(new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+
+
+                                    if(!MainActivity.isActivityVisible())
+                                    {
+                                        Intent startMain = new Intent(Intent.ACTION_MAIN);
+                                        startMain.addCategory(Intent.CATEGORY_HOME);
+                                        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        getActivity().onBackPressed();
+                                        startActivity(startMain);
+                                        Toast.makeText(getContext(), "Get Back To Working!", Toast.LENGTH_LONG).show();
+
+                                    }
+
+                                }
+                            }, appExitWaitTime);
+                        }
+                    }, appLaunchWaitTime);
+                }
+                else
+                {
+                    Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(MainActivity.allApplications.get(position).getApp().activityInfo.packageName);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    getContext().startActivity(intent);
+                }
             }
         });
     }
