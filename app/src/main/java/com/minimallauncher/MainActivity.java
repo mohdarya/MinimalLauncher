@@ -103,6 +103,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onPause() {
+        MainActivity.saveData();
         super.onPause();
         MainActivity.activityPaused();
     }
@@ -128,7 +129,7 @@ public static void saveData()
     Type appListType = new TypeToken<ArrayList<App>>(){}.getType();
     String json = gson.toJson(MainActivity.allApplications, appListType);
     editor.putString(DATA, json);
-    editor.apply();
+    editor.commit();
 
 }
 
