@@ -132,14 +132,15 @@ public class restricted_apps extends Fragment
                                         startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                         getActivity().onBackPressed();
                                         startActivity(startMain);
+                                        getActivity().onBackPressed();
                                         Toast.makeText(getContext(), "Get Back To Working!", Toast.LENGTH_LONG).show();
 
                                     }
 
                             }
-                        }, appExitWaitTime);
+                        }, 3000);
                     }
-                }, appLaunchWaitTime);
+                }, 1);
 
             }
         });

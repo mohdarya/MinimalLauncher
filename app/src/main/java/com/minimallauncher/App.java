@@ -11,7 +11,6 @@ public class App
     private boolean regular = false;
     private ResolveInfo app;
 
-
     public App(String applicationName, ResolveInfo app)
     {
         this.applicationName = applicationName;

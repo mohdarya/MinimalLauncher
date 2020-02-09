@@ -22,8 +22,12 @@ import java.util.List;
 
 
 
+
+
+
 public class MainActivity extends AppCompatActivity
 {
+
 
     public static String SHARED_PREFS = "sharedPrefs";
     public static String DATA = "data1";
@@ -41,7 +45,7 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public int compare(App o1, App o2)
                 {
-                    return o1.getApplicationName().toLowerCase().compareTo(o2.getApplicationName().toLowerCase());
+                    return o1.getPackageName().toLowerCase().compareTo(o2.getPackageName().toLowerCase());
                 }
             });
             return true;
@@ -145,6 +149,15 @@ public static void loadData()
     }
 }
 
-
+private void removeApplication(String appName)
+{
+    for(int i = 0; i < allApplications.size(); i++)
+    {
+        if(allApplications.get(i).getApplicationName().equals(appName))
+        {
+            allApplications.remove(i);
+        }
+    }
+}
 
 }
