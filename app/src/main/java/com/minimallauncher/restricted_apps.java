@@ -138,9 +138,9 @@ public class restricted_apps extends Fragment
                                     }
 
                             }
-                        }, 3000);
+                        }, appExitWaitTime);
                     }
-                }, 1);
+                }, appLaunchWaitTime);
 
             }
         });
