@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public int compare(App o1, App o2)
                 {
-                    return o1.getPackageName().toLowerCase().compareTo(o2.getPackageName().toLowerCase());
+                    return o1.getApplicationName().toLowerCase().compareTo(o2.getApplicationName().toLowerCase());
                 }
             });
             return true;
