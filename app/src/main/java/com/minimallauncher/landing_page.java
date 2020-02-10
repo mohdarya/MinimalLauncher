@@ -112,7 +112,6 @@ public class landing_page extends Fragment
             public void onAppClicked(int position)
             {
                     Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(regularApps.get(position).getPackageName());
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     getContext().startActivity(intent);
 
 

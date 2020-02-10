@@ -98,7 +98,7 @@ public class all_apps extends Fragment
                         {
                             Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(MainActivity.allApplications.get(appPosition).getPackageName());
                             intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                            //intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                             getContext().startActivity(intent);
                             int appExitWaitTime = random.nextInt(600000 - 300000) + 300000;
                             Handler handler = new Handler();
@@ -128,7 +128,6 @@ public class all_apps extends Fragment
                 else
                 {
                     Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(MainActivity.allApplications.get(position).getPackageName());
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     getContext().startActivity(intent);
                 }
             }

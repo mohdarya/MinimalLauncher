@@ -112,8 +112,8 @@ public class restricted_apps extends Fragment
                     public void run()
                     {
                         Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(restrictedApps.get(appPosition).getPackageName());
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                       // intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
                         getContext().startActivity(intent);
                         final String packageName = restrictedApps.get(appPosition).getPackageName();
                         int appExitWaitTime = random.nextInt(600000 - 300000) + 300000;
@@ -130,7 +130,6 @@ public class restricted_apps extends Fragment
                                         Intent startMain = new Intent(Intent.ACTION_MAIN);
                                         startMain.addCategory(Intent.CATEGORY_HOME);
                                         startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        getActivity().onBackPressed();
                                         startActivity(startMain);
                                         getActivity().onBackPressed();
                                         Toast.makeText(getContext(), "Get Back To Working!", Toast.LENGTH_LONG).show();
