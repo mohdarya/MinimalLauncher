@@ -1,5 +1,6 @@
 package com.minimallauncher;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -113,6 +115,11 @@ public class landing_page extends Fragment
             {
                     Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(regularApps.get(position).getPackageName());
                     getContext().startActivity(intent);
+                ActivityManager mActivityManager = (ActivityManager) getContext().getSystemService(Context.ACTIVITY_SERVICE);
+                List<ActivityManager.AppTask> RunningTask = mActivityManager.getAppTasks();
+                ActivityManager.RecentTaskInfo activityOnTop= RunningTask.get(1).getTaskInfo();
+                //Log.e("test", "test");
+                Log.e("Activity", activityOnTop.toString());
 
 
 
@@ -136,7 +143,7 @@ public class landing_page extends Fragment
             public void onClick(View v)
             {
                 Random random = new Random();
-                int waitTime = random.nextInt(10000 - 5000) + 5000;
+                int waitTime = random.nextInt(15000 - 10000) + 10000;
 
                 //TODO: try to recreate the error happening when you try to launch the restriced apps
                 if(!restricedPressed)

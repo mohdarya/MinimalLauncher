@@ -1,6 +1,7 @@
 package com.minimallauncher;
 
 import android.app.ActivityManager;
+import android.app.KeyguardManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -88,7 +89,7 @@ public class restricted_apps extends Fragment
 
 
     //TODO: anytime restricted app is opened go to home
-    //TODO: go to home screen when thaat app is open otherwise dont
+    //TODO: go to home screen when that app is open otherwise dont
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState)
     {
         RecyclerView restrictedRV = (RecyclerView) view.findViewById(R.id.restricted_recyler_view);
@@ -103,7 +104,7 @@ public class restricted_apps extends Fragment
             public void onAppClicked(int position)
             {
                 final Random random = new Random();
-                int appLaunchWaitTime = random.nextInt(10000 - 5000) + 5000;
+                int appLaunchWaitTime = random.nextInt(15000 - 10000) + 10000;;
                 final int appPosition = position;
                 Handler handlerEnter = new Handler();
                 handlerEnter.postDelayed(new Runnable()
@@ -113,7 +114,7 @@ public class restricted_apps extends Fragment
                     {
                         Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(restrictedApps.get(appPosition).getPackageName());
                        // intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                         getContext().startActivity(intent);
                         final String packageName = restrictedApps.get(appPosition).getPackageName();
                         int appExitWaitTime = random.nextInt(600000 - 300000) + 300000;
@@ -124,8 +125,8 @@ public class restricted_apps extends Fragment
                             public void run()
                             {
 
-
-                                    if(!MainActivity.isActivityVisible())
+                                KeyguardManager myKM = (KeyguardManager) getContext().getSystemService(Context.KEYGUARD_SERVICE);
+                                    if(!MainActivity.isActivityVisible() && !myKM.isDeviceLocked())
                                     {
                                         Intent startMain = new Intent(Intent.ACTION_MAIN);
                                         startMain.addCategory(Intent.CATEGORY_HOME);

@@ -1,5 +1,7 @@
 package com.minimallauncher;
 
+import android.app.ActivityManager;
+import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -16,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -88,7 +91,7 @@ public class all_apps extends Fragment
                 if(MainActivity.allApplications.get(position).isRestricted())
                 {
                     final Random random = new Random();
-                    int appLaunchWaitTime = random.nextInt(10000 - 5000) + 5000;
+                    int appLaunchWaitTime = random.nextInt(15000 - 10000) + 10000;
                     final int appPosition = position;
                     Handler handlerEnter = new Handler();
                     handlerEnter.postDelayed(new Runnable()
@@ -100,6 +103,10 @@ public class all_apps extends Fragment
                             intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                             //intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                             getContext().startActivity(intent);
+
+
+
+
                             int appExitWaitTime = random.nextInt(600000 - 300000) + 300000;
                             Handler handler = new Handler();
                             handler.postDelayed(new Runnable()
@@ -109,7 +116,8 @@ public class all_apps extends Fragment
                                 {
 
 
-                                    if(!MainActivity.isActivityVisible())
+                                    KeyguardManager myKM = (KeyguardManager) getContext().getSystemService(Context.KEYGUARD_SERVICE);
+                                    if(!MainActivity.isActivityVisible() && !myKM.isDeviceLocked())
                                     {
                                         Intent startMain = new Intent(Intent.ACTION_MAIN);
                                         startMain.addCategory(Intent.CATEGORY_HOME);
