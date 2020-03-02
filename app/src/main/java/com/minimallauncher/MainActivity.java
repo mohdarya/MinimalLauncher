@@ -73,8 +73,8 @@ public class MainActivity extends AppCompatActivity
     public void onBackPressed()
     {
         if (fragmentLaunched > 0){
-            fragmentLaunched--;
             super.onBackPressed();
+            fragmentLaunched--;
         }
 
     }

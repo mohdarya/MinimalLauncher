@@ -5,6 +5,7 @@ import android.app.KeyguardManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,8 +27,11 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+
+import static android.content.Context.ACTIVITY_SERVICE;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -124,23 +129,31 @@ public class restricted_apps extends Fragment
                             @Override
                             public void run()
                             {
+                                ActivityManager manager = (ActivityManager) getContext().getSystemService(ACTIVITY_SERVICE);
+                                String mPackageName = manager.getRunningAppProcesses().get(0).pkgList[0];
+                                    String mClassName = manager.getRunningAppProcesses().get(0).getClass().getName();
 
-                                KeyguardManager myKM = (KeyguardManager) getContext().getSystemService(Context.KEYGUARD_SERVICE);
-                                    if(!MainActivity.isActivityVisible() && !myKM.isDeviceLocked())
+                                    Log.e("package", mPackageName);
+                                    Log.e("class", mClassName);
+
+                                    /*
+                                    if(!MainActivity.isActivityVisible())
                                     {
                                         Intent startMain = new Intent(Intent.ACTION_MAIN);
                                         startMain.addCategory(Intent.CATEGORY_HOME);
-                                        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        startMain.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                         startActivity(startMain);
-                                        getActivity().onBackPressed();
+                                        //getActivity().onBackPressed();
                                         Toast.makeText(getContext(), "Get Back To Working!", Toast.LENGTH_LONG).show();
 
                                     }
 
+                                     */
+
                             }
-                        }, appExitWaitTime);
+                        }, 1);
                     }
-                }, appLaunchWaitTime);
+                }, 1);
 
             }
         });
