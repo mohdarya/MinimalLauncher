@@ -103,10 +103,10 @@ public class all_apps extends Fragment
                             intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                             //intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                             getContext().startActivity(intent);
+                            MainActivity.categoryLaunched = "R";
 
 
-
-
+/*
                             int appExitWaitTime = random.nextInt(600000 - 300000) + 300000;
                             Handler handler = new Handler();
                             handler.postDelayed(new Runnable()
@@ -130,6 +130,8 @@ public class all_apps extends Fragment
 
                                 }
                             }, appExitWaitTime);
+
+ */
                         }
                     }, appLaunchWaitTime);
                 }
@@ -137,6 +139,7 @@ public class all_apps extends Fragment
                 {
                     Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(MainActivity.allApplications.get(position).getPackageName());
                     getContext().startActivity(intent);
+                    MainActivity.categoryLaunched = "N";
                 }
             }
         });

@@ -1,11 +1,16 @@
 package com.minimallauncher;
 
+import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ResolveInfo;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,8 +32,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity
 {
-
-
+    private Thread vibrateThraed;
+    public static String categoryLaunched = "";
     public static String SHARED_PREFS = "sharedPrefs";
     public static String DATA = "data1";
     private static boolean activityVisible;
@@ -60,10 +65,11 @@ public class MainActivity extends AppCompatActivity
 
         super.onCreate(savedInstanceState);
         context = this;
-       loadData();
+        loadData();
         getApplications();
         font = Typeface.createFromAsset(context.getAssets(), "fonts/Helvetica.ttc");
         setContentView(R.layout.content_main);
+        setVibrateThraed();
 
     }
 
@@ -101,15 +107,29 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onResume() {
+
         super.onResume();
         MainActivity.activityResumed();
+        if(categoryLaunched.equals("R"))
+        {
+            vibrateThraed.interrupt();
+            setVibrateThraed();
+        }
+        categoryLaunched = "";
     }
 
     @Override
     protected void onPause() {
-        MainActivity.saveData();
+
         super.onPause();
+        MainActivity.saveData();
         MainActivity.activityPaused();
+        if(categoryLaunched.equals("R"))
+        {
+            vibrateThraed.start();
+        }
+
+
     }
 
     public static boolean isActivityVisible() {
@@ -124,6 +144,43 @@ public class MainActivity extends AppCompatActivity
         activityVisible = false;
     }
 
+    private void setVibrateThraed()
+    {
+
+        final Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        Runnable runnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+
+                    boolean once = false;
+                    while(!Thread.currentThread().isInterrupted())
+                    {
+
+                        KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+                        boolean locked = km.inKeyguardRestrictedInputMode();
+
+                            if(!locked && once)
+                            {
+                                v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+                            }
+                            Thread.sleep(300000);
+                            once = true;
+
+                    }
+                }
+                catch(InterruptedException consumed)
+                {
+                    Log.e("Thread", "Thraed Stopped");
+                }
+            }
+        };
+
+       vibrateThraed = new Thread(runnable);
+    }
 
 public static void saveData()
 {

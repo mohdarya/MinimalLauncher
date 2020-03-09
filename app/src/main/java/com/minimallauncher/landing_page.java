@@ -115,11 +115,7 @@ public class landing_page extends Fragment
             {
                     Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(regularApps.get(position).getPackageName());
                     getContext().startActivity(intent);
-                ActivityManager mActivityManager = (ActivityManager) getContext().getSystemService(Context.ACTIVITY_SERVICE);
-                List<ActivityManager.AppTask> RunningTask = mActivityManager.getAppTasks();
-                ActivityManager.RecentTaskInfo activityOnTop= RunningTask.get(1).getTaskInfo();
-                //Log.e("test", "test");
-                Log.e("Activity", activityOnTop.toString());
+                MainActivity.categoryLaunched = "N";
 
 
 

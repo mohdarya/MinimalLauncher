@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
+import android.os.VibrationEffect;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +25,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import android.os.Vibrator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -119,9 +121,11 @@ public class restricted_apps extends Fragment
                     {
                         Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(restrictedApps.get(appPosition).getPackageName());
                        // intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                         getContext().startActivity(intent);
                         final String packageName = restrictedApps.get(appPosition).getPackageName();
+                        MainActivity.categoryLaunched = "R";
+                        /*
                         int appExitWaitTime = random.nextInt(600000 - 300000) + 300000;
                         Handler handler = new Handler();
                         handler.postDelayed(new Runnable()
@@ -148,12 +152,13 @@ public class restricted_apps extends Fragment
 
                                     }
 
-                                     */
+
 
                             }
                         }, 1);
+                        */
                     }
-                }, 1);
+                }, appLaunchWaitTime);
 
             }
         });
