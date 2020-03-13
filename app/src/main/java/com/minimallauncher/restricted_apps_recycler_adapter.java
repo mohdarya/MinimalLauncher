@@ -75,7 +75,7 @@ public class restricted_apps_recycler_adapter extends RecyclerView.Adapter<restr
                     if (listener != null) {
                         int position = getAdapterPosition();
                         if (position != RecyclerView.NO_POSITION) {
-                            listener.onAppClicked(position);
+                              listener.onAppClicked(position);
                         }
                     }
 

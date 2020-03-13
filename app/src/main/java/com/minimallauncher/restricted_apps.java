@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
+import android.os.Message;
 import android.os.VibrationEffect;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -294,6 +295,10 @@ public class restricted_apps extends Fragment
                 } catch (InterruptedException consumed)
                 {
                     Log.e("Restricted Application Launch Thread ", "Thraed Stopped");
+                    Message message = new Message();
+                    message.arg1 = 1;
+                    message.obj = "Restricted app launch stopped";
+                    MainActivity.mhandler.sendMessage(message);
                     restrictedApplicationLaunched = false;
                 }
             }

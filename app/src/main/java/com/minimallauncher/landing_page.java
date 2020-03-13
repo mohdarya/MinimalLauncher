@@ -151,6 +151,7 @@ public class landing_page extends Fragment
                 {
 
                     timesLaunched = 0;
+                    Toast.makeText(MainActivity.context, "Wait time multiplier reset", Toast.LENGTH_SHORT).show();
                     Log.e("last launched ", "reset");
 
                 }
@@ -277,6 +278,10 @@ public class landing_page extends Fragment
                 catch(InterruptedException consumed)
                 {
                     Log.e("Restricted Launch Thread ", "Thraed Stopped");
+                    Message message = new Message();
+                    message.arg1 = 1;
+                    message.obj = "Restricted section launch stopped";
+                    MainActivity.mhandler.sendMessage(message);
                     restricedPressed = false;
 
                 }

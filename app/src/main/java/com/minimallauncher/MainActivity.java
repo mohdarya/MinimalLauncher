@@ -29,6 +29,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static com.minimallauncher.landing_page.timesLaunched;
+
 
 public class MainActivity extends AppCompatActivity
 {
@@ -41,7 +43,7 @@ public class MainActivity extends AppCompatActivity
     static int fragmentLaunched = 0;
     static Context context;
     static Activity activity;
-    Handler mhandler;
+    static Handler mhandler;
     static Typeface font;
     static List<App> allApplications = new ArrayList<App>()
     {
@@ -80,7 +82,15 @@ public class MainActivity extends AppCompatActivity
             @Override
             public boolean handleMessage(Message msg)
             {
-                Toast.makeText(getApplicationContext(), "Minutes passed: " + msg.arg1 * 5, Toast.LENGTH_LONG).show();
+                if(msg.arg1 == 1)
+                {
+                    KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+                    boolean locked = km.inKeyguardRestrictedInputMode();
+                    if(!locked)
+                    {
+                        Toast.makeText(getApplicationContext(), msg.obj.toString(), Toast.LENGTH_LONG).show();
+                    }
+                }
                 return false;
             }
         });
@@ -193,18 +203,18 @@ public class MainActivity extends AppCompatActivity
                     while (!Thread.currentThread().isInterrupted())
                     {
 
-                        KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
-                        boolean locked = km.inKeyguardRestrictedInputMode();
 
-                        if (!locked && mins > 0)
+
+                        if (mins > 0)
                         {
                             v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
                             message = new Message();
-                            message.arg1 = mins;
+                            message.arg1 = 1;
+                            message.obj = "Minutes passed: " + mins * 5;
                             mhandler.sendMessage(message);
 
                         }
-                        Thread.sleep(300000);
+                       Thread.sleep(300000);
                         mins++;
 
                     }
