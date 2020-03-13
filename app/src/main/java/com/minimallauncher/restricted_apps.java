@@ -1,5 +1,6 @@
 package com.minimallauncher;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.KeyguardManager;
 import android.content.ComponentName;
@@ -26,14 +27,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import android.os.Vibrator;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.MissingFormatArgumentException;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import static android.content.Context.ACTIVITY_SERVICE;
+import static com.minimallauncher.landing_page.timesLaunched;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -52,6 +57,8 @@ public class restricted_apps extends Fragment
     private List<App> restrictedApps;
 
     private OnFragmentInteractionListener mListener;
+    static Thread restrictedAppLaunchThread;
+    static Boolean restrictedApplicationLaunched = false;
 
     public restricted_apps()
     {
@@ -107,25 +114,38 @@ public class restricted_apps extends Fragment
         restrictedRV.setLayoutManager(new GridLayoutManager(getContext(), 1));
         adapter.setOnItemClickListener(new restricted_apps_recycler_adapter.OnItemClickListener()
         {
+            @SuppressLint("DefaultLocale")
             @Override
             public void onAppClicked(int position)
             {
-                final Random random = new Random();
-                int appLaunchWaitTime = random.nextInt(15000 - 10000) + 10000;;
-                final int appPosition = position;
+
+                if(!restrictedApplicationLaunched)
+                {
+                    restrictedApplicationLaunched = true;
+                    final Random random = new Random();
+                    int appLaunchWaitTime = random.nextInt(15000 - 10000) + 10000;
+                    setApplicationLaunchThread(appLaunchWaitTime, position);
+                    restrictedAppLaunchThread.start();
+                    Log.e("Restricted Application Launch Thread ", "Thraed Started");
+                    Log.e("Restricted App Launch wait time ", TimeUnit.MILLISECONDS.toSeconds(appLaunchWaitTime + 10000 * (timesLaunched - 1) ) + " seconds");
+                    if(appLaunchWaitTime + 10000 * (timesLaunched - 1) > 60000 )
+                    {
+                        Toast.makeText(getContext(), "wait time: " + String.format("%d mins",
+                                TimeUnit.MILLISECONDS.toMinutes(appLaunchWaitTime + 10000 * (timesLaunched - 1))
+                        ), Toast.LENGTH_LONG).show();
+                    }
+
+                }
+
+                /*
                 Handler handlerEnter = new Handler();
                 handlerEnter.postDelayed(new Runnable()
                 {
                     @Override
                     public void run()
                     {
-                        Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(restrictedApps.get(appPosition).getPackageName());
-                       // intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                        getContext().startActivity(intent);
-                        final String packageName = restrictedApps.get(appPosition).getPackageName();
-                        MainActivity.categoryLaunched = "R";
-                        /*
+
+
                         int appExitWaitTime = random.nextInt(600000 - 300000) + 300000;
                         Handler handler = new Handler();
                         handler.postDelayed(new Runnable()
@@ -156,12 +176,20 @@ public class restricted_apps extends Fragment
 
                             }
                         }, 1);
-                        */
+
                     }
-                }, appLaunchWaitTime);
+                }, appLaunchWaitTime + (timesLaunched - 1) * 10000);
+
+
+
+                 */
 
             }
         });
+
+
+
+
 
     }
 
@@ -228,5 +256,51 @@ public class restricted_apps extends Fragment
         void onFragmentInteraction(Uri uri);
     }
 
+    private void setApplicationLaunchThread(int WaitTime, int applicationPosition)
+    {
+
+        final int appPosition = applicationPosition;
+        final int waitTime = WaitTime;
+        Runnable runnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+
+
+                    Thread.sleep(waitTime + 10000 * (timesLaunched - 1));
+                    KeyguardManager km = (KeyguardManager) MainActivity.context.getSystemService(Context.KEYGUARD_SERVICE);
+                    boolean locked = km.inKeyguardRestrictedInputMode();
+
+                    if (locked)
+                    {
+                        Log.e("system status ", "locked");
+                    }
+                    if (!locked)
+                    {
+                        Intent intent = MainActivity.context.getPackageManager().getLaunchIntentForPackage(restrictedApps.get(appPosition).getPackageName());
+                        intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+                        restrictedApplicationLaunched = false;
+                        MainActivity.activity.onBackPressed();
+                        MainActivity.context.startActivity(intent);
+                        MainActivity.categoryLaunched = "R";
+
+                        Log.e("Restricted Application Launched ", restrictedApps.get(appPosition).getApplicationName());
+                    }
+
+
+                } catch (InterruptedException consumed)
+                {
+                    Log.e("Restricted Application Launch Thread ", "Thraed Stopped");
+                    restrictedApplicationLaunched = false;
+                }
+            }
+        };
+
+        restrictedAppLaunchThread = new Thread(runnable);
+
+    }
 
 }

@@ -1,6 +1,8 @@
 package com.minimallauncher;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
+import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,6 +16,8 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
+import android.os.Message;
+import android.os.VibrationEffect;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,10 +29,12 @@ import android.widget.Toast;
 
 import java.time.Clock;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -45,6 +51,10 @@ public class landing_page extends Fragment
 
 
 
+    static int timesLaunched;
+    long lastLaunchedTime = 0;
+    static Thread restrictedLaunchThread;
+    Calendar calendar = Calendar.getInstance();
     landing_page_recycler_adapter adapter;
     static landing_page_recycler_adapter copyOfAdapter;
     static boolean restricedPressed = false;
@@ -55,14 +65,6 @@ public class landing_page extends Fragment
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment landing_page.
-     */
 
     public static landing_page newInstance(String param1, String param2)
     {
@@ -75,6 +77,7 @@ public class landing_page extends Fragment
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
     }
 
     @Override
@@ -135,9 +138,22 @@ public class landing_page extends Fragment
         final Button restrictedApps = view.findViewById(R.id.restricted_button);
         restrictedApps.setOnClickListener(new View.OnClickListener()
         {
+            @SuppressLint("DefaultLocale")
             @Override
             public void onClick(View v)
             {
+
+                calendar = Calendar.getInstance();
+                Log.e("last launched ", Long.toString(lastLaunchedTime));
+                Log.e("current time ", Long.toString(calendar.getTimeInMillis()));
+                Log.e("time Passed ",Long.toString(calendar.getTimeInMillis() - lastLaunchedTime ));
+                if(calendar.getTimeInMillis() - lastLaunchedTime > 3600000)
+                {
+
+                    timesLaunched = 0;
+                    Log.e("last launched ", "reset");
+
+                }
                 Random random = new Random();
                 int waitTime = random.nextInt(15000 - 10000) + 10000;
 
@@ -145,19 +161,19 @@ public class landing_page extends Fragment
                 if(!restricedPressed)
                 {
                     restricedPressed = true;
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable()
+                    lastLaunchedTime = calendar.getTimeInMillis();
+                    setRestrictedLaunchThread(waitTime, view);
+                    restrictedLaunchThread.start();
+                    Log.e("Restricted Launch Thread ", "Thraed Started");
+                    Log.e("Restricted Launch wait time ", TimeUnit.MILLISECONDS.toSeconds(waitTime + 10000 * timesLaunched) + " seconds");
+                    if(waitTime + 10000 * timesLaunched > 60000 )
                     {
-                        @Override
-                        public void run()
-                        {
+                        Toast.makeText(getContext(), "wait time: " + String.format("%d mins",
+                                TimeUnit.MILLISECONDS.toMinutes(waitTime + 10000 * timesLaunched)
+                        ), Toast.LENGTH_LONG).show();
+                    }
 
-                            Navigation.findNavController(view).navigate(landing_pageDirections.actionLandingToRestricted());
-                            MainActivity.fragmentLaunched++;
-                            restricedPressed = false;
 
-                        }
-                    }, waitTime);
                 }
 
             }
@@ -222,5 +238,52 @@ public class landing_page extends Fragment
             }
         }
         return regularApps;
+    }
+
+    private void setRestrictedLaunchThread(int WaitTime, View appView)
+    {
+        final int waitTime = WaitTime;
+        final View view = appView;
+        Runnable runnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+
+
+                        Thread.sleep(waitTime + 10000 * timesLaunched);
+                        KeyguardManager km = (KeyguardManager) MainActivity.context.getSystemService(Context.KEYGUARD_SERVICE);
+                        boolean locked = km.inKeyguardRestrictedInputMode();
+
+                        if(locked)
+                        {
+                            Log.e("system status ", "locked");
+                        }
+                        if(!locked)
+                        {
+                            Navigation.findNavController(view).navigate(landing_pageDirections.actionLandingToRestricted());
+                            MainActivity.fragmentLaunched++;
+                            timesLaunched++;
+                            restricedPressed = false;
+                            Log.e("times launched ", Integer.toString(timesLaunched));
+
+                        }
+
+
+
+                }
+                catch(InterruptedException consumed)
+                {
+                    Log.e("Restricted Launch Thread ", "Thraed Stopped");
+                    restricedPressed = false;
+
+                }
+            }
+        };
+
+        restrictedLaunchThread = new Thread(runnable);
+
     }
 }

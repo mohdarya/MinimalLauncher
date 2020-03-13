@@ -88,59 +88,13 @@ public class all_apps extends Fragment
             public void onAppClicked(int position)
             {
 
-                if(MainActivity.allApplications.get(position).isRestricted())
-                {
-                    final Random random = new Random();
-                    int appLaunchWaitTime = random.nextInt(15000 - 10000) + 10000;
-                    final int appPosition = position;
-                    Handler handlerEnter = new Handler();
-                    handlerEnter.postDelayed(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(MainActivity.allApplications.get(appPosition).getPackageName());
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                            //intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                            getContext().startActivity(intent);
-                            MainActivity.categoryLaunched = "R";
-
-
-/*
-                            int appExitWaitTime = random.nextInt(600000 - 300000) + 300000;
-                            Handler handler = new Handler();
-                            handler.postDelayed(new Runnable()
-                            {
-                                @Override
-                                public void run()
-                                {
-
-
-                                    KeyguardManager myKM = (KeyguardManager) getContext().getSystemService(Context.KEYGUARD_SERVICE);
-                                    if(!MainActivity.isActivityVisible() && !myKM.isDeviceLocked())
-                                    {
-                                        Intent startMain = new Intent(Intent.ACTION_MAIN);
-                                        startMain.addCategory(Intent.CATEGORY_HOME);
-                                        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        startActivity(startMain);
-                                        getActivity().onBackPressed();
-                                        Toast.makeText(getContext(), "Get Back To Working!", Toast.LENGTH_LONG).show();
-
-                                    }
-
-                                }
-                            }, appExitWaitTime);
-
- */
-                        }
-                    }, appLaunchWaitTime);
-                }
-                else
+                if(!MainActivity.allApplications.get(position).isRestricted())
                 {
                     Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(MainActivity.allApplications.get(position).getPackageName());
                     getContext().startActivity(intent);
                     MainActivity.categoryLaunched = "N";
                 }
+
             }
         });
     }

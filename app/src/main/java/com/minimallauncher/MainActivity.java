@@ -1,5 +1,6 @@
 package com.minimallauncher;
 
+import android.app.Activity;
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
@@ -8,9 +9,12 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,10 +30,6 @@ import java.util.Comparator;
 import java.util.List;
 
 
-
-
-
-
 public class MainActivity extends AppCompatActivity
 {
     private Thread vibrateThraed;
@@ -37,10 +37,14 @@ public class MainActivity extends AppCompatActivity
     public static String SHARED_PREFS = "sharedPrefs";
     public static String DATA = "data1";
     private static boolean activityVisible;
+    Message message;
     static int fragmentLaunched = 0;
     static Context context;
-    static Typeface font ;
-    static List<App> allApplications = new ArrayList<App>(){
+    static Activity activity;
+    Handler mhandler;
+    static Typeface font;
+    static List<App> allApplications = new ArrayList<App>()
+    {
         public boolean add(App data)
         {
 
@@ -65,52 +69,77 @@ public class MainActivity extends AppCompatActivity
 
         super.onCreate(savedInstanceState);
         context = this;
+        activity = this;
         loadData();
         getApplications();
         font = Typeface.createFromAsset(context.getAssets(), "fonts/Helvetica.ttc");
         setContentView(R.layout.content_main);
         setVibrateThraed();
+        mhandler = new Handler(new Handler.Callback()
+        {
+            @Override
+            public boolean handleMessage(Message msg)
+            {
+                Toast.makeText(getApplicationContext(), "Minutes passed: " + msg.arg1 * 5, Toast.LENGTH_LONG).show();
+                return false;
+            }
+        });
 
     }
-
 
 
     @Override
     public void onBackPressed()
     {
-        if (fragmentLaunched > 0){
-            super.onBackPressed();
-            fragmentLaunched--;
+        if (!restricted_apps.restrictedApplicationLaunched)
+        {
+            if (fragmentLaunched > 0)
+            {
+                super.onBackPressed();
+                fragmentLaunched--;
+            }
+            if (landing_page.restricedPressed)
+            {
+                landing_page.restrictedLaunchThread.interrupt();
+            }
+        }
+        else
+        {
+            restricted_apps.restrictedAppLaunchThread.interrupt();
+            restricted_apps.restrictedApplicationLaunched = false;
         }
 
+
     }
+
 
     public void getApplications()
     {
 
         Intent intent = new Intent(Intent.ACTION_MAIN, null);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
-       List< ResolveInfo> allApps = getApplicationContext().getPackageManager().queryIntentActivities(intent,0);
+        List<ResolveInfo> allApps = getApplicationContext().getPackageManager().queryIntentActivities(intent, 0);
 
 
-            for (int i = 0; i < allApps.size(); i++)
+        for (int i = 0; i < allApps.size(); i++)
+        {
+            App temp = new App(allApps.get(i).activityInfo.loadLabel(getPackageManager()).toString(), allApps.get(i).activityInfo.packageName);
+            if (!allApplications.contains(temp))
             {
-                App temp = new App(allApps.get(i).activityInfo.loadLabel(getPackageManager()).toString(), allApps.get(i).activityInfo.packageName);
-                if(!allApplications.contains(temp))
-                {
-                    allApplications.add(temp);
-                }
+                allApplications.add(temp);
             }
+        }
 
 
     }
 
     @Override
-    protected void onResume() {
+    protected void onResume()
+    {
 
         super.onResume();
         MainActivity.activityResumed();
-        if(categoryLaunched.equals("R"))
+        if (categoryLaunched.equals("R"))
         {
             vibrateThraed.interrupt();
             setVibrateThraed();
@@ -119,12 +148,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onPause() {
+    protected void onPause()
+    {
 
         super.onPause();
         MainActivity.saveData();
         MainActivity.activityPaused();
-        if(categoryLaunched.equals("R"))
+        if (categoryLaunched.equals("R"))
         {
             vibrateThraed.start();
         }
@@ -132,15 +162,18 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    public static boolean isActivityVisible() {
+    public static boolean isActivityVisible()
+    {
         return activityVisible;
     }
 
-    public static void activityResumed() {
+    public static void activityResumed()
+    {
         activityVisible = true;
     }
 
-    public static void activityPaused() {
+    public static void activityPaused()
+    {
         activityVisible = false;
     }
 
@@ -156,65 +189,73 @@ public class MainActivity extends AppCompatActivity
                 try
                 {
 
-                    boolean once = false;
-                    while(!Thread.currentThread().isInterrupted())
+                    int mins = 0;
+                    while (!Thread.currentThread().isInterrupted())
                     {
 
                         KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
                         boolean locked = km.inKeyguardRestrictedInputMode();
 
-                            if(!locked && once)
-                            {
-                                v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
-                            }
-                            Thread.sleep(300000);
-                            once = true;
+                        if (!locked && mins > 0)
+                        {
+                            v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+                            message = new Message();
+                            message.arg1 = mins;
+                            mhandler.sendMessage(message);
+
+                        }
+                        Thread.sleep(300000);
+                        mins++;
 
                     }
                 }
-                catch(InterruptedException consumed)
+                catch (InterruptedException consumed)
                 {
-                    Log.e("Thread", "Thraed Stopped");
+                    Log.e("Vibrate Thread ", "Thraed Stopped");
                 }
             }
         };
 
-       vibrateThraed = new Thread(runnable);
+        vibrateThraed = new Thread(runnable);
     }
 
-public static void saveData()
-{
-    SharedPreferences sharedPreferences = context.getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-    SharedPreferences.Editor editor = sharedPreferences.edit();
-    Gson gson = new Gson();
-    Type appListType = new TypeToken<ArrayList<App>>(){}.getType();
-    String json = gson.toJson(MainActivity.allApplications, appListType);
-    editor.putString(DATA, json);
-    editor.commit();
-
-}
-
-public static void loadData()
-{
-    SharedPreferences sharedPreferences = context.getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-    Gson gson = new Gson();
-    String json = sharedPreferences.getString(DATA,"");
-    Type appListType = new TypeToken<ArrayList<App>>(){}.getType();
-    if(!json.equals(""))
+    public static void saveData()
     {
-        MainActivity.allApplications = gson.fromJson(json, appListType);
-    }
-}
-
-private void removeApplication(String appName)
-{
-    for(int i = 0; i < allApplications.size(); i++)
-    {
-        if(allApplications.get(i).getApplicationName().equals(appName))
+        SharedPreferences sharedPreferences = context.getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        Type appListType = new TypeToken<ArrayList<App>>()
         {
-            allApplications.remove(i);
+        }.getType();
+        String json = gson.toJson(MainActivity.allApplications, appListType);
+        editor.putString(DATA, json);
+        editor.commit();
+
+    }
+
+    public static void loadData()
+    {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString(DATA, "");
+        Type appListType = new TypeToken<ArrayList<App>>()
+        {
+        }.getType();
+        if (!json.equals(""))
+        {
+            MainActivity.allApplications = gson.fromJson(json, appListType);
         }
     }
-}
+
+    private void removeApplication(String appName)
+    {
+        for (int i = 0; i < allApplications.size(); i++)
+        {
+            if (allApplications.get(i).getApplicationName().equals(appName))
+            {
+                allApplications.remove(i);
+            }
+        }
+    }
 
 }
