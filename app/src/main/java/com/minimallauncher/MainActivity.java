@@ -25,6 +25,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -45,25 +46,7 @@ public class MainActivity extends AppCompatActivity
     static Activity activity;
     static Handler mhandler;
     static Typeface font;
-    static List<App> allApplications = new ArrayList<App>()
-    {
-        public boolean add(App data)
-        {
-
-            super.add(data);
-            Collections.sort(allApplications, new Comparator<App>()
-            {
-                @Override
-                public int compare(App o1, App o2)
-                {
-                    return o1.getApplicationName().toLowerCase().compareTo(o2.getApplicationName().toLowerCase());
-                }
-            });
-            return true;
-        }
-
-
-    };
+    static List<App> allApplications = new ArrayList<App>();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
@@ -82,11 +65,11 @@ public class MainActivity extends AppCompatActivity
             @Override
             public boolean handleMessage(Message msg)
             {
-                if(msg.arg1 == 1)
+                if (msg.arg1 == 1)
                 {
                     KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
                     boolean locked = km.inKeyguardRestrictedInputMode();
-                    if(!locked)
+                    if (!locked)
                     {
                         Toast.makeText(getApplicationContext(), msg.obj.toString(), Toast.LENGTH_LONG).show();
                     }
@@ -126,11 +109,13 @@ public class MainActivity extends AppCompatActivity
     public void getApplications()
     {
 
+        for (int i = 0; i < allApplications.size(); i++)
+        {
+            allApplications.get(i).setInstalled(false);
+        }
         Intent intent = new Intent(Intent.ACTION_MAIN, null);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         List<ResolveInfo> allApps = getApplicationContext().getPackageManager().queryIntentActivities(intent, 0);
-
-
         for (int i = 0; i < allApps.size(); i++)
         {
             App temp = new App(allApps.get(i).activityInfo.loadLabel(getPackageManager()).toString(), allApps.get(i).activityInfo.packageName);
@@ -138,7 +123,28 @@ public class MainActivity extends AppCompatActivity
             {
                 allApplications.add(temp);
             }
+            if (allApplications.contains(temp))
+            {
+                allApplications.get(allApplications.indexOf(temp)).setInstalled(true);
+            }
         }
+
+        for (int i = 0; i < allApplications.size(); i++)
+        {
+            if (!allApplications.get(i).isInstalled())
+            {
+                allApplications.remove(i);
+            }
+        }
+
+        Collections.sort(allApplications, new Comparator<App>()
+        {
+            @Override
+            public int compare(App o1, App o2)
+            {
+                return o1.getApplicationName().toLowerCase().compareTo(o2.getApplicationName().toLowerCase());
+            }
+        });
 
 
     }
@@ -153,8 +159,15 @@ public class MainActivity extends AppCompatActivity
         {
             vibrateThraed.interrupt();
             setVibrateThraed();
+            Calendar calendar = Calendar.getInstance();
+            landing_page.setlastLaunchedTime(calendar.getTimeInMillis());
         }
         categoryLaunched = "";
+        getApplications();
+        if(all_apps.adapter != null)
+        {
+            all_apps.adapter.notifyDataSetChanged();
+        }
     }
 
     @Override
@@ -168,6 +181,7 @@ public class MainActivity extends AppCompatActivity
         {
             vibrateThraed.start();
         }
+
 
 
     }
@@ -204,7 +218,6 @@ public class MainActivity extends AppCompatActivity
                     {
 
 
-
                         if (mins > 0)
                         {
                             v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
@@ -214,7 +227,7 @@ public class MainActivity extends AppCompatActivity
                             mhandler.sendMessage(message);
 
                         }
-                       Thread.sleep(300000);
+                        Thread.sleep(300000);
                         mins++;
 
                     }
@@ -257,15 +270,5 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void removeApplication(String appName)
-    {
-        for (int i = 0; i < allApplications.size(); i++)
-        {
-            if (allApplications.get(i).getApplicationName().equals(appName))
-            {
-                allApplications.remove(i);
-            }
-        }
-    }
 
 }

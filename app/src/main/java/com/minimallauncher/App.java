@@ -10,6 +10,7 @@ public class App
     private boolean restricted = false;
     private boolean regular = false;
     private ResolveInfo app;
+    private boolean installed;
 
     public App(String applicationName, ResolveInfo app)
     {
@@ -96,5 +97,16 @@ public class App
     public void setPackageName(String packageName)
     {
         this.packageName = packageName;
+    }
+
+
+    public boolean isInstalled()
+    {
+        return installed;
+    }
+
+    public void setInstalled(boolean installed)
+    {
+        this.installed = installed;
     }
 }

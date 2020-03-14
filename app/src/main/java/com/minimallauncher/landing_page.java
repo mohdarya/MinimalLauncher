@@ -50,9 +50,8 @@ public class landing_page extends Fragment
 {
 
 
-
     static int timesLaunched;
-    long lastLaunchedTime = 0;
+    static long lastLaunchedTime = 0;
     static Thread restrictedLaunchThread;
     Calendar calendar = Calendar.getInstance();
     landing_page_recycler_adapter adapter;
@@ -60,6 +59,7 @@ public class landing_page extends Fragment
     static boolean restricedPressed = false;
     private OnFragmentInteractionListener mListener;
     private List<App> regularApps;
+
     public landing_page()
     {
         // Required empty public constructor
@@ -101,6 +101,7 @@ public class landing_page extends Fragment
         super.onAttach(context);
 
     }
+
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState)
     {
@@ -116,10 +117,9 @@ public class landing_page extends Fragment
             @Override
             public void onAppClicked(int position)
             {
-                    Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(regularApps.get(position).getPackageName());
-                    getContext().startActivity(intent);
+                Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(regularApps.get(position).getPackageName());
+                getContext().startActivity(intent);
                 MainActivity.categoryLaunched = "N";
-
 
 
             }
@@ -131,7 +131,7 @@ public class landing_page extends Fragment
             public void onClick(View v)
             {
 
-             Navigation.findNavController(view).navigate(landing_pageDirections.actionLandingPageToAllApps());
+                Navigation.findNavController(view).navigate(landing_pageDirections.actionLandingPageToAllApps());
                 MainActivity.fragmentLaunched++;
             }
         });
@@ -146,8 +146,8 @@ public class landing_page extends Fragment
                 calendar = Calendar.getInstance();
                 Log.e("last launched ", Long.toString(lastLaunchedTime));
                 Log.e("current time ", Long.toString(calendar.getTimeInMillis()));
-                Log.e("time Passed ",Long.toString(calendar.getTimeInMillis() - lastLaunchedTime ));
-                if(calendar.getTimeInMillis() - lastLaunchedTime > 3600000)
+                Log.e("time Passed ", Long.toString(calendar.getTimeInMillis() - lastLaunchedTime));
+                if (calendar.getTimeInMillis() - lastLaunchedTime > 3600000 * 2)
                 {
 
                     timesLaunched = 0;
@@ -159,15 +159,14 @@ public class landing_page extends Fragment
                 int waitTime = random.nextInt(15000 - 10000) + 10000;
 
                 //TODO: try to recreate the error happening when you try to launch the restriced apps
-                if(!restricedPressed)
+                if (!restricedPressed)
                 {
                     restricedPressed = true;
-                    lastLaunchedTime = calendar.getTimeInMillis();
                     setRestrictedLaunchThread(waitTime, view);
                     restrictedLaunchThread.start();
                     Log.e("Restricted Launch Thread ", "Thraed Started");
                     Log.e("Restricted Launch wait time ", TimeUnit.MILLISECONDS.toSeconds(waitTime + 10000 * timesLaunched) + " seconds");
-                    if(waitTime + 10000 * timesLaunched > 60000 )
+                    if (waitTime + 10000 * timesLaunched > 60000)
                     {
                         Toast.makeText(getContext(), "wait time: " + String.format("%d mins",
                                 TimeUnit.MILLISECONDS.toMinutes(waitTime + 10000 * timesLaunched)
@@ -215,25 +214,26 @@ public class landing_page extends Fragment
 
     List<App> getApps()
     {
-        MainActivity activity = (MainActivity)getActivity();
-        regularApps  = new ArrayList<App>(){
-        public boolean add(App data)
+        MainActivity activity = (MainActivity) getActivity();
+        regularApps = new ArrayList<App>()
         {
-            super.add(data);
-            Collections.sort(regularApps, new Comparator<App>()
+            public boolean add(App data)
             {
-                @Override
-                public int compare(App o1, App o2)
+                super.add(data);
+                Collections.sort(regularApps, new Comparator<App>()
                 {
-                    return o1.getApplicationName().toLowerCase().compareTo(o2.getApplicationName().toLowerCase());
-                }
-            });
-            return true;
-        }
-    };
-        for(int i = 0; i < activity.allApplications.size(); i++)
+                    @Override
+                    public int compare(App o1, App o2)
+                    {
+                        return o1.getApplicationName().toLowerCase().compareTo(o2.getApplicationName().toLowerCase());
+                    }
+                });
+                return true;
+            }
+        };
+        for (int i = 0; i < activity.allApplications.size(); i++)
         {
-            if(activity.allApplications.get(i).isRegular())
+            if (activity.allApplications.get(i).isRegular())
             {
                 regularApps.add(activity.allApplications.get(i));
             }
@@ -254,28 +254,27 @@ public class landing_page extends Fragment
                 {
 
 
-                        Thread.sleep(waitTime + 10000 * timesLaunched);
-                        KeyguardManager km = (KeyguardManager) MainActivity.context.getSystemService(Context.KEYGUARD_SERVICE);
-                        boolean locked = km.inKeyguardRestrictedInputMode();
+                    Thread.sleep(waitTime + 10000 * timesLaunched);
+                    KeyguardManager km = (KeyguardManager) MainActivity.context.getSystemService(Context.KEYGUARD_SERVICE);
+                    boolean locked = km.inKeyguardRestrictedInputMode();
 
-                        if(locked)
-                        {
-                            Log.e("system status ", "locked");
-                        }
-                        if(!locked)
-                        {
-                            Navigation.findNavController(view).navigate(landing_pageDirections.actionLandingToRestricted());
-                            MainActivity.fragmentLaunched++;
-                            timesLaunched++;
-                            restricedPressed = false;
-                            Log.e("times launched ", Integer.toString(timesLaunched));
+                    if (locked)
+                    {
+                        Log.e("system status ", "locked");
+                    }
+                    if (!locked && MainActivity.isActivityVisible())
+                    {
+                        Navigation.findNavController(view).navigate(landing_pageDirections.actionLandingToRestricted());
+                        MainActivity.fragmentLaunched++;
+                        timesLaunched++;
+                        restricedPressed = false;
+                        Log.e("times launched ", Integer.toString(timesLaunched));
 
-                        }
-
+                    }
 
 
                 }
-                catch(InterruptedException consumed)
+                catch (InterruptedException consumed)
                 {
                     Log.e("Restricted Launch Thread ", "Thraed Stopped");
                     Message message = new Message();
@@ -290,5 +289,11 @@ public class landing_page extends Fragment
 
         restrictedLaunchThread = new Thread(runnable);
 
+    }
+
+
+    static public void setlastLaunchedTime(long lastLaunchedTimeToSet)
+    {
+        lastLaunchedTime = lastLaunchedTimeToSet;
     }
 }

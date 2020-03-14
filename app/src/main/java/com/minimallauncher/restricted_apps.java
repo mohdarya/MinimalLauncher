@@ -279,7 +279,7 @@ public class restricted_apps extends Fragment
                     {
                         Log.e("system status ", "locked");
                     }
-                    if (!locked)
+                    if (!locked && MainActivity.isActivityVisible())
                     {
                         Intent intent = MainActivity.context.getPackageManager().getLaunchIntentForPackage(restrictedApps.get(appPosition).getPackageName());
                         intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
