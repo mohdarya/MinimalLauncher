@@ -168,6 +168,10 @@ public class MainActivity extends AppCompatActivity
         {
             all_apps.adapter.notifyDataSetChanged();
         }
+        if(landing_page.copyOfAdapter != null)
+        {
+            landing_page.copyOfAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override
