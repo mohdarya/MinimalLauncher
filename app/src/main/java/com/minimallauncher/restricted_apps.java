@@ -128,11 +128,11 @@ public class restricted_apps extends Fragment
                     setApplicationLaunchThread(appLaunchWaitTime, position);
                     restrictedAppLaunchThread.start();
                     Log.e("Restricted Application Launch Thread ", "Thraed Started");
-                    Log.e("Restricted App Launch wait time ", TimeUnit.MILLISECONDS.toSeconds(appLaunchWaitTime + 10000 * (timesLaunched - 1) ) + " seconds");
-                    if(appLaunchWaitTime + 10000 * (timesLaunched - 1) > 60000 )
+                    Log.e("Restricted App Launch wait time ", TimeUnit.MILLISECONDS.toSeconds(appLaunchWaitTime + 10000 * timesLaunched  ) + " seconds");
+                    if(appLaunchWaitTime + 10000 * timesLaunched  > 60000 )
                     {
                         Toast.makeText(getContext(), "wait time: " + String.format("%d mins",
-                                TimeUnit.MILLISECONDS.toMinutes(appLaunchWaitTime + 10000 * (timesLaunched - 1))
+                                TimeUnit.MILLISECONDS.toMinutes(appLaunchWaitTime + 10000 * timesLaunched )
                         ), Toast.LENGTH_LONG).show();
                     }
 
@@ -271,7 +271,7 @@ public class restricted_apps extends Fragment
                 {
 
 
-                    Thread.sleep(waitTime + 10000 * (timesLaunched - 1));
+                    Thread.sleep(waitTime + 10000 * timesLaunched );
                     KeyguardManager km = (KeyguardManager) MainActivity.context.getSystemService(Context.KEYGUARD_SERVICE);
                     boolean locked = km.inKeyguardRestrictedInputMode();
 
@@ -284,6 +284,8 @@ public class restricted_apps extends Fragment
                         Intent intent = MainActivity.context.getPackageManager().getLaunchIntentForPackage(restrictedApps.get(appPosition).getPackageName());
                         intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
                         restrictedApplicationLaunched = false;
+                        timesLaunched++;
+                        Log.e("times launched ", Integer.toString(timesLaunched));
                         MainActivity.activity.onBackPressed();
                         MainActivity.context.startActivity(intent);
                         MainActivity.categoryLaunched = "R";

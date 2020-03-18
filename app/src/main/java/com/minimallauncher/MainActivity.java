@@ -124,6 +124,7 @@ public class MainActivity extends AppCompatActivity
             {
                 allApplications.add(temp);
                 applicationChanged = true;
+                Log.e("Application", "application was added");
             }
             if (allApplications.contains(temp))
             {
@@ -137,6 +138,7 @@ public class MainActivity extends AppCompatActivity
             {
                 allApplications.remove(i);
                 applicationChanged = true;
+                Log.e("Application", "application was removed");
             }
         }
 

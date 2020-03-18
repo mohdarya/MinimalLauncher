@@ -156,9 +156,11 @@ public class landing_page extends Fragment
                     Log.e("last launched ", "reset");
 
                 }
-                if(lastLaunchedTime - restrictedLaunched > 1800000)
+                if(lastLaunchedTime - restrictedLaunched > 5000 && restrictedLaunched != 0)
                 {
-                    timesLaunched += ((lastLaunchedTime - restrictedLaunched) / 1800000);
+                    timesLaunched += ((lastLaunchedTime - restrictedLaunched) / 900000);
+                    restrictedLaunched = 0;
+                    Log.e("times launched ", "incremented by " + ((lastLaunchedTime - restrictedLaunched) / 900000));
                 }
                 Random random = new Random();
                 int waitTime = random.nextInt(15000 - 10000) + 10000;
@@ -271,11 +273,10 @@ public class landing_page extends Fragment
                     {
                         Navigation.findNavController(view).navigate(landing_pageDirections.actionLandingToRestricted());
                         MainActivity.fragmentLaunched++;
-                        timesLaunched++;
                         restricedPressed = false;
                         calendar = Calendar.getInstance();
                         restrictedLaunched = calendar.getTimeInMillis();
-                        Log.e("times launched ", Integer.toString(timesLaunched));
+
 
                     }
 
