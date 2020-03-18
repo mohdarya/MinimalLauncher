@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity
     static Handler mhandler;
     static Typeface font;
     static List<App> allApplications = new ArrayList<App>();
+    boolean applicationChanged = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
@@ -122,6 +123,7 @@ public class MainActivity extends AppCompatActivity
             if (!allApplications.contains(temp))
             {
                 allApplications.add(temp);
+                applicationChanged = true;
             }
             if (allApplications.contains(temp))
             {
@@ -134,6 +136,7 @@ public class MainActivity extends AppCompatActivity
             if (!allApplications.get(i).isInstalled())
             {
                 allApplications.remove(i);
+                applicationChanged = true;
             }
         }
 
@@ -164,13 +167,17 @@ public class MainActivity extends AppCompatActivity
         }
         categoryLaunched = "";
         getApplications();
-        if(all_apps.adapter != null)
+        if(applicationChanged)
         {
-            all_apps.adapter.notifyDataSetChanged();
-        }
-        if(landing_page.copyOfAdapter != null)
-        {
-            landing_page.copyOfAdapter.notifyDataSetChanged();
+            if (all_apps.adapter != null)
+            {
+                all_apps.adapter.notifyDataSetChanged();
+            }
+            if (landing_page.copyOfAdapter != null)
+            {
+                landing_page.copyOfAdapter.notifyDataSetChanged();
+            }
+            applicationChanged = false;
         }
     }
 
@@ -231,6 +238,7 @@ public class MainActivity extends AppCompatActivity
                             mhandler.sendMessage(message);
 
                         }
+
                         Thread.sleep(300000);
                         mins++;
 

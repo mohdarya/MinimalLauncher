@@ -52,6 +52,7 @@ public class landing_page extends Fragment
 
     static int timesLaunched;
     static long lastLaunchedTime = 0;
+    static long restrictedLaunched = 0;
     static Thread restrictedLaunchThread;
     Calendar calendar = Calendar.getInstance();
     landing_page_recycler_adapter adapter;
@@ -154,6 +155,10 @@ public class landing_page extends Fragment
                     Toast.makeText(MainActivity.context, "Wait time multiplier reset", Toast.LENGTH_SHORT).show();
                     Log.e("last launched ", "reset");
 
+                }
+                if(lastLaunchedTime - restrictedLaunched > 1800000)
+                {
+                    timesLaunched += ((lastLaunchedTime - restrictedLaunched) / 1800000);
                 }
                 Random random = new Random();
                 int waitTime = random.nextInt(15000 - 10000) + 10000;
@@ -268,6 +273,8 @@ public class landing_page extends Fragment
                         MainActivity.fragmentLaunched++;
                         timesLaunched++;
                         restricedPressed = false;
+                        calendar = Calendar.getInstance();
+                        restrictedLaunched = calendar.getTimeInMillis();
                         Log.e("times launched ", Integer.toString(timesLaunched));
 
                     }
