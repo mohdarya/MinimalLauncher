@@ -156,7 +156,7 @@ public class landing_page extends Fragment
                     Log.e("last launched ", "reset");
 
                 }
-                if(lastLaunchedTime - restrictedLaunched > 5000 && restrictedLaunched != 0)
+                if(lastLaunchedTime - restrictedLaunched > 1800000 && restrictedLaunched != 0)
                 {
                     timesLaunched += ((lastLaunchedTime - restrictedLaunched) / 900000);
                     restrictedLaunched = 0;
