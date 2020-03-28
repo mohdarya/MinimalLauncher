@@ -289,7 +289,6 @@ public class restricted_apps extends Fragment
                         MainActivity.activity.onBackPressed();
                         MainActivity.context.startActivity(intent);
                         MainActivity.categoryLaunched = "R";
-
                         Log.e("Restricted Application Launched ", restrictedApps.get(appPosition).getApplicationName());
                     }
 

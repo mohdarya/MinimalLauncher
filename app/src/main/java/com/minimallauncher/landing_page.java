@@ -15,6 +15,7 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
 import android.os.VibrationEffect;
@@ -27,6 +28,7 @@ import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.sql.Time;
 import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -48,7 +50,6 @@ import java.util.concurrent.TimeUnit;
 //TODO: add the timer to show the phone usage time, currently set to invisible
 public class landing_page extends Fragment
 {
-
 
     static int timesLaunched;
     static long lastLaunchedTime = 0;
@@ -79,6 +80,7 @@ public class landing_page extends Fragment
     {
         super.onCreate(savedInstanceState);
 
+
     }
 
     @Override
@@ -103,6 +105,7 @@ public class landing_page extends Fragment
 
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState)
     {
@@ -156,7 +159,7 @@ public class landing_page extends Fragment
                     Log.e("last launched ", "reset");
 
                 }
-                if(lastLaunchedTime - restrictedLaunched > 1800000 && restrictedLaunched != 0)
+                if (lastLaunchedTime - restrictedLaunched > 1800000 && restrictedLaunched != 0)
                 {
                     timesLaunched += ((lastLaunchedTime - restrictedLaunched) / 900000);
                     restrictedLaunched = 0;
@@ -165,7 +168,7 @@ public class landing_page extends Fragment
                 Random random = new Random();
                 int waitTime = random.nextInt(15000 - 10000) + 10000;
 
-                //TODO: try to recreate the error happening when you try to launch the restriced apps
+
                 if (!restricedPressed)
                 {
                     restricedPressed = true;
@@ -188,6 +191,10 @@ public class landing_page extends Fragment
 
         TextClock clock = view.findViewById(R.id.landing_page_clock);
         clock.setTypeface(MainActivity.font);
+        TextView textViewTimer = view.findViewById(R.id.time_remaining);
+        textViewTimer.setTypeface(MainActivity.font);
+        textViewTimer.setText("00:00:00");
+
     }
 
     private void setCopyOfAdapter()
@@ -304,4 +311,6 @@ public class landing_page extends Fragment
     {
         lastLaunchedTime = lastLaunchedTimeToSet;
     }
+
+
 }

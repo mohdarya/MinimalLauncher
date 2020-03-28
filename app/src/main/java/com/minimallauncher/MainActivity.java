@@ -1,5 +1,6 @@
 package com.minimallauncher;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.KeyguardManager;
 import android.content.Context;
@@ -8,12 +9,14 @@ import android.content.SharedPreferences;
 import android.content.pm.ResolveInfo;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -29,12 +32,15 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.minimallauncher.landing_page.timesLaunched;
 
 
 public class MainActivity extends AppCompatActivity
 {
+
+    CountDownTimer timeRemaining;
     private Thread vibrateThraed;
     public static String categoryLaunched = "";
     public static String SHARED_PREFS = "sharedPrefs";
@@ -78,6 +84,33 @@ public class MainActivity extends AppCompatActivity
                 return false;
             }
         });
+
+        timeRemaining = new CountDownTimer(3600000 * 2, 1000)
+        {
+            @SuppressLint("DefaultLocale")
+            @Override
+            public void onTick(long millisUntilFinished)
+            {
+                TextView textViewTimer = findViewById(R.id.time_remaining);
+                if(textViewTimer != null)
+                {
+                    textViewTimer.setText(String.format("%d:%d:%d", TimeUnit.MILLISECONDS.toHours(millisUntilFinished),
+                            TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millisUntilFinished)),
+                            TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished))));
+                }
+            }
+
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onFinish()
+            {
+                TextView textViewTimer = findViewById(R.id.time_remaining);
+                if(textViewTimer != null)
+                {
+                    textViewTimer.setText("00:00:00");
+                }
+            }
+        };
 
     }
 
@@ -165,6 +198,8 @@ public class MainActivity extends AppCompatActivity
             vibrateThraed.interrupt();
             setVibrateThraed();
             Calendar calendar = Calendar.getInstance();
+            timeRemaining.start();
+            Log.e("Countdown timer", "started");
             landing_page.setlastLaunchedTime(calendar.getTimeInMillis());
         }
         categoryLaunched = "";
@@ -193,6 +228,8 @@ public class MainActivity extends AppCompatActivity
         if (categoryLaunched.equals("R"))
         {
             vibrateThraed.start();
+            timeRemaining.cancel();
+            Log.e("Countdown timer", "stopped");
         }
 
 
