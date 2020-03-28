@@ -193,7 +193,14 @@ public class landing_page extends Fragment
         clock.setTypeface(MainActivity.font);
         TextView textViewTimer = view.findViewById(R.id.time_remaining);
         textViewTimer.setTypeface(MainActivity.font);
-        textViewTimer.setText("00:00:00");
+        if(MainActivity.timeRemainingString == null)
+        {
+            textViewTimer.setText("00:00:00");
+        }
+        else
+        {
+            textViewTimer.setText(MainActivity.timeRemainingString);
+        }
 
     }
 

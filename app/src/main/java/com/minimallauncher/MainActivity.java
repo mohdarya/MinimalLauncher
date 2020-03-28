@@ -40,6 +40,7 @@ import static com.minimallauncher.landing_page.timesLaunched;
 public class MainActivity extends AppCompatActivity
 {
 
+    static String timeRemainingString;
     CountDownTimer timeRemaining;
     private Thread vibrateThraed;
     public static String categoryLaunched = "";
@@ -91,12 +92,13 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onTick(long millisUntilFinished)
             {
+                timeRemainingString = (String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millisUntilFinished),
+                        TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millisUntilFinished)),
+                        TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished))));
                 TextView textViewTimer = findViewById(R.id.time_remaining);
                 if(textViewTimer != null)
                 {
-                    textViewTimer.setText(String.format("%d:%d:%d", TimeUnit.MILLISECONDS.toHours(millisUntilFinished),
-                            TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millisUntilFinished)),
-                            TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished))));
+                    textViewTimer.setText(timeRemainingString);
                 }
             }
 
@@ -108,6 +110,7 @@ public class MainActivity extends AppCompatActivity
                 if(textViewTimer != null)
                 {
                     textViewTimer.setText("00:00:00");
+                    timeRemainingString = null;
                 }
             }
         };
@@ -229,6 +232,7 @@ public class MainActivity extends AppCompatActivity
         {
             vibrateThraed.start();
             timeRemaining.cancel();
+            timeRemainingString = null;
             Log.e("Countdown timer", "stopped");
         }
 
