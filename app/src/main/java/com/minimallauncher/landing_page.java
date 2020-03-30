@@ -281,6 +281,7 @@ public class landing_page extends Fragment
 
                     if (locked)
                     {
+                        restricedPressed = false;
                         Log.e("system status ", "locked");
                     }
                     if (!locked && MainActivity.isActivityVisible())

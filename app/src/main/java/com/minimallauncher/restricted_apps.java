@@ -277,6 +277,7 @@ public class restricted_apps extends Fragment
 
                     if (locked)
                     {
+                        restrictedApplicationLaunched = false;
                         Log.e("system status ", "locked");
                     }
                     if (!locked && MainActivity.isActivityVisible())

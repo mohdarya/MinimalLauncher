@@ -106,11 +106,11 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onFinish()
             {
+                timeRemainingString = null;
                 TextView textViewTimer = findViewById(R.id.time_remaining);
                 if(textViewTimer != null)
                 {
                     textViewTimer.setText("00:00:00");
-                    timeRemainingString = null;
                 }
             }
         };
