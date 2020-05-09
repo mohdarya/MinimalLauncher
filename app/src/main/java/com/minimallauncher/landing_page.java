@@ -135,8 +135,11 @@ public class landing_page extends Fragment
             public void onClick(View v)
             {
 
-                Navigation.findNavController(view).navigate(landing_pageDirections.actionLandingPageToAllApps());
-                MainActivity.fragmentLaunched++;
+                if(!restricedPressed)
+                {
+                    Navigation.findNavController(view).navigate(landing_pageDirections.actionLandingPageToAllApps());
+                    MainActivity.fragmentLaunched++;
+                }
             }
         });
         final Button restrictedApps = view.findViewById(R.id.restricted_button);
@@ -279,22 +282,23 @@ public class landing_page extends Fragment
                     KeyguardManager km = (KeyguardManager) MainActivity.context.getSystemService(Context.KEYGUARD_SERVICE);
                     boolean locked = km.inKeyguardRestrictedInputMode();
 
-                    if (locked)
+                    if (locked || !MainActivity.isActivityVisible())
                     {
                         restricedPressed = false;
                         Log.e("system status ", "locked");
                     }
                     if (!locked && MainActivity.isActivityVisible())
                     {
-                        Navigation.findNavController(view).navigate(landing_pageDirections.actionLandingToRestricted());
-                        MainActivity.fragmentLaunched++;
-                        restricedPressed = false;
-                        calendar = Calendar.getInstance();
-                        restrictedLaunched = calendar.getTimeInMillis();
+
+                            Navigation.findNavController(view).navigate(landing_pageDirections.actionLandingToRestricted());
+                            MainActivity.fragmentLaunched++;
+                            restricedPressed = false;
+                            calendar = Calendar.getInstance();
+                            restrictedLaunched = calendar.getTimeInMillis();
+
 
 
                     }
-
 
                 }
                 catch (InterruptedException consumed)

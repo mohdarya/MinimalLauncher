@@ -275,7 +275,7 @@ public class restricted_apps extends Fragment
                     KeyguardManager km = (KeyguardManager) MainActivity.context.getSystemService(Context.KEYGUARD_SERVICE);
                     boolean locked = km.inKeyguardRestrictedInputMode();
 
-                    if (locked)
+                    if (locked || !MainActivity.isActivityVisible())
                     {
                         restrictedApplicationLaunched = false;
                         Log.e("system status ", "locked");
