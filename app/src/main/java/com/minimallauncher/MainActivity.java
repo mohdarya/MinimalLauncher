@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity
     public static String DATA = "data1";
     private static boolean activityVisible;
     private static String lastApp = "";
-
+    private static boolean granted = false;
     private static boolean runApplicationChecker;
     Message message;
     static int fragmentLaunched = 0;
@@ -57,10 +57,12 @@ public class MainActivity extends AppCompatActivity
     {
 
         super.onCreate(savedInstanceState);
+
         context = this;
         activity = this;
         loadData();
         getApplications();
+        checkIfGranted();
         font = Typeface.createFromAsset(context.getAssets(), "fonts/Helvetica.ttc");
         setContentView(R.layout.content_main);
         setVibrateThraed();
@@ -203,7 +205,7 @@ public class MainActivity extends AppCompatActivity
             Log.e("Countdown timer", "started");
             landing_page.setlastLaunchedTime(calendar.getTimeInMillis());
         }
-        else
+        else if(granted)
         {
             applicationCheckThread.interrupt();
             setApplicationCheckerThread();
@@ -241,7 +243,7 @@ public class MainActivity extends AppCompatActivity
             timeRemainingString = null;
             Log.e("Countdown timer", "stopped");
         }
-        else
+        else if(granted)
         {
             applicationCheckThread.start();
         }
@@ -311,16 +313,6 @@ public class MainActivity extends AppCompatActivity
 
                             }
 
-                        }else if(mySortedMap != null && !mySortedMap.isEmpty()  && lastApp.equals(mySortedMap.get(mySortedMap.lastKey()).getPackageName()))
-                        {
-                            try
-                            {
-                                Thread.sleep(10000);
-                            }
-                            catch (InterruptedException e)
-                            {
-                                e.printStackTrace();
-                            }
                         }
 
                     }
@@ -332,6 +324,19 @@ public class MainActivity extends AppCompatActivity
         applicationCheckThread = new Thread(runnable);
     }
 
+    private void checkIfGranted()
+    {
+
+        AppOpsManager appOps = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
+        int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
+                android.os.Process.myUid(), context.getPackageName());
+
+        if (mode == AppOpsManager.MODE_DEFAULT) {
+            granted = (context.checkCallingOrSelfPermission(android.Manifest.permission.PACKAGE_USAGE_STATS) == PackageManager.PERMISSION_GRANTED);
+        } else {
+            granted = (mode == AppOpsManager.MODE_ALLOWED);
+        }
+    }
     private void setVibrateThraed()
     {
 
