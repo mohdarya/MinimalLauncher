@@ -2,51 +2,47 @@ package com.minimallauncher;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AppOpsManager;
 import android.app.KeyguardManager;
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Typeface;
-import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
+import android.os.*;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
-
-import static com.minimallauncher.landing_page.timesLaunched;
 
 
 public class MainActivity extends AppCompatActivity
 {
 
+
     static String timeRemainingString;
     CountDownTimer timeRemaining;
     private Thread vibrateThraed;
+    private Thread applicationCheckThread;
     public static String categoryLaunched = "";
     public static String SHARED_PREFS = "sharedPrefs";
     public static String DATA = "data1";
     private static boolean activityVisible;
+    private static String lastApp = "";
+
+    private static boolean runApplicationChecker;
     Message message;
     static int fragmentLaunched = 0;
     static Context context;
@@ -68,6 +64,7 @@ public class MainActivity extends AppCompatActivity
         font = Typeface.createFromAsset(context.getAssets(), "fonts/Helvetica.ttc");
         setContentView(R.layout.content_main);
         setVibrateThraed();
+        setApplicationCheckerThread();
         mhandler = new Handler(new Handler.Callback()
         {
             @Override
@@ -96,7 +93,7 @@ public class MainActivity extends AppCompatActivity
                         TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millisUntilFinished)),
                         TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished))));
                 TextView textViewTimer = findViewById(R.id.time_remaining);
-                if(textViewTimer != null)
+                if (textViewTimer != null)
                 {
                     textViewTimer.setText(timeRemainingString);
                 }
@@ -108,7 +105,7 @@ public class MainActivity extends AppCompatActivity
             {
                 timeRemainingString = null;
                 TextView textViewTimer = findViewById(R.id.time_remaining);
-                if(textViewTimer != null)
+                if (textViewTimer != null)
                 {
                     textViewTimer.setText("00:00:00");
                 }
@@ -196,6 +193,7 @@ public class MainActivity extends AppCompatActivity
 
         super.onResume();
         MainActivity.activityResumed();
+
         if (categoryLaunched.equals("R"))
         {
             vibrateThraed.interrupt();
@@ -205,9 +203,14 @@ public class MainActivity extends AppCompatActivity
             Log.e("Countdown timer", "started");
             landing_page.setlastLaunchedTime(calendar.getTimeInMillis());
         }
+        else
+        {
+            applicationCheckThread.interrupt();
+            setApplicationCheckerThread();
+        }
         categoryLaunched = "";
         getApplications();
-        if(applicationChanged)
+        if (applicationChanged)
         {
             if (all_apps.adapter != null)
             {
@@ -228,6 +231,9 @@ public class MainActivity extends AppCompatActivity
         super.onPause();
         MainActivity.saveData();
         MainActivity.activityPaused();
+        runApplicationChecker = true;
+
+
         if (categoryLaunched.equals("R"))
         {
             vibrateThraed.start();
@@ -235,10 +241,15 @@ public class MainActivity extends AppCompatActivity
             timeRemainingString = null;
             Log.e("Countdown timer", "stopped");
         }
-
+        else
+        {
+            applicationCheckThread.start();
+        }
 
 
     }
+
+
 
     public static boolean isActivityVisible()
     {
@@ -248,11 +259,77 @@ public class MainActivity extends AppCompatActivity
     public static void activityResumed()
     {
         activityVisible = true;
+
+
     }
 
     public static void activityPaused()
     {
         activityVisible = false;
+
+
+    }
+
+    private void setApplicationCheckerThread()
+    {
+        Runnable runnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+
+
+                while (!Thread.currentThread().isInterrupted())
+                {
+
+
+                    UsageStatsManager mUsageStatsManager = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
+                    long time = System.currentTimeMillis();
+
+                    List<UsageStats> stats = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, time - 1000 * 10, time);
+                    if (stats != null)
+                    {
+                        SortedMap<Long, UsageStats> mySortedMap = new TreeMap<>();
+                        for (UsageStats usageStats : stats)
+                        {
+                            mySortedMap.put(usageStats.getLastTimeUsed(), usageStats);
+                        }
+                        if (mySortedMap != null && !mySortedMap.isEmpty() && !lastApp.equals(mySortedMap.get(mySortedMap.lastKey()).getPackageName()))
+                        {
+                            lastApp = mySortedMap.get(mySortedMap.lastKey()).getPackageName();
+
+                            for (App application : allApplications)
+                            {
+                                if (application.isRestricted() && application.getPackageName().equals(mySortedMap.get(mySortedMap.lastKey()).getPackageName()))
+                                {
+                                    Intent i = new Intent(MainActivity.this, MainActivity.class);
+                                    i.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                                    startActivity(i);
+
+
+                                }
+
+                            }
+
+                        }else if(mySortedMap != null && !mySortedMap.isEmpty()  && lastApp.equals(mySortedMap.get(mySortedMap.lastKey()).getPackageName()))
+                        {
+                            try
+                            {
+                                Thread.sleep(10000);
+                            }
+                            catch (InterruptedException e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+
+                    }
+
+                }
+            }
+        };
+
+        applicationCheckThread = new Thread(runnable);
     }
 
     private void setVibrateThraed()
@@ -289,7 +366,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 catch (InterruptedException consumed)
                 {
-                    Log.e("Vibrate Thread ", "Thraed Stopped");
+                    Log.e("Application checker Thread ", "Thraed Stopped");
                 }
             }
         };
