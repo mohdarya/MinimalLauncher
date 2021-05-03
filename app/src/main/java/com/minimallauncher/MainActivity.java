@@ -33,7 +33,9 @@ public class MainActivity extends AppCompatActivity
 
 
     static String timeRemainingString;
-    CountDownTimer timeRemaining;
+    static final String LAST_LAUNCHED = "lastLaunched";
+    static final long CLOCK_RESET_TIME = 3600000 * 2;
+     CountDownTimer timeRemaining;
     private Thread vibrateThraed;
     private Thread applicationCheckThread;
     public static String categoryLaunched = "";
@@ -57,6 +59,7 @@ public class MainActivity extends AppCompatActivity
     {
 
         super.onCreate(savedInstanceState);
+
 
         context = this;
         activity = this;
@@ -85,37 +88,33 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        timeRemaining = new CountDownTimer(3600000 * 2, 1000)
-        {
-            @SuppressLint("DefaultLocale")
-            @Override
-            public void onTick(long millisUntilFinished)
-            {
-                timeRemainingString = (String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millisUntilFinished),
-                        TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millisUntilFinished)),
-                        TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished))));
-                TextView textViewTimer = findViewById(R.id.time_remaining);
-                if (textViewTimer != null)
-                {
-                    textViewTimer.setText(timeRemainingString);
-                }
-            }
+        if (savedInstanceState != null) {
+            // Restore value of members from saved state
+            long lastLaunched = savedInstanceState.getLong(LAST_LAUNCHED);
 
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onFinish()
+            landing_page.setlastLaunchedTime( lastLaunched);
+            Calendar timeTesting = Calendar.getInstance();
+            if(timeTesting.getTimeInMillis() - lastLaunched < CLOCK_RESET_TIME)
             {
-                timeRemainingString = null;
-                TextView textViewTimer = findViewById(R.id.time_remaining);
-                if (textViewTimer != null)
-                {
-                    textViewTimer.setText("00:00:00");
-                }
+                setCountDownTimer(CLOCK_RESET_TIME - (timeTesting.getTimeInMillis() - lastLaunched ));
+                timeRemaining.start();
+                Log.e("Countdown timer", "restored");
             }
-        };
+        }
+
 
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save the user's current game state
+        savedInstanceState.putLong(LAST_LAUNCHED, landing_page.lastLaunchedTime );
+
+
+
+        // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(savedInstanceState);
+    }
 
     @Override
     public void onBackPressed()
@@ -141,6 +140,37 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    private void setCountDownTimer(long time)
+    {
+        timeRemaining = new CountDownTimer(time, 1000)
+        {
+            @SuppressLint("DefaultLocale")
+            @Override
+            public void onTick(long millisUntilFinished)
+            {
+                timeRemainingString = (String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millisUntilFinished),
+                        TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millisUntilFinished)),
+                        TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished))));
+                TextView textViewTimer = activity.findViewById(R.id.time_remaining);
+                if (textViewTimer != null)
+                {
+                    textViewTimer.setText(timeRemainingString);
+                }
+            }
+
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onFinish()
+            {
+                timeRemainingString = null;
+                TextView textViewTimer =  activity.findViewById(R.id.time_remaining);
+                if (textViewTimer != null)
+                {
+                    textViewTimer.setText("00:00:00");
+                }
+            }
+        };
+    }
 
     public void getApplications()
     {
@@ -201,6 +231,7 @@ public class MainActivity extends AppCompatActivity
             vibrateThraed.interrupt();
             setVibrateThraed();
             Calendar calendar = Calendar.getInstance();
+            setCountDownTimer(CLOCK_RESET_TIME);
             timeRemaining.start();
             Log.e("Countdown timer", "started");
             landing_page.setlastLaunchedTime(calendar.getTimeInMillis());
@@ -224,6 +255,9 @@ public class MainActivity extends AppCompatActivity
             }
             applicationChanged = false;
         }
+
+
+
     }
 
     @Override
@@ -239,9 +273,13 @@ public class MainActivity extends AppCompatActivity
         if (categoryLaunched.equals("R"))
         {
             vibrateThraed.start();
-            timeRemaining.cancel();
-            timeRemainingString = null;
-            Log.e("Countdown timer", "stopped");
+            if(timeRemaining != null)
+            {
+                timeRemaining.cancel();
+                timeRemainingString = null;
+                Log.e("Countdown timer", "stopped");
+            }
+
         }
         else if(granted)
         {
