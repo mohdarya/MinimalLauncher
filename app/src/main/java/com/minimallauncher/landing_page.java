@@ -7,7 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Bundle;
+import android.os.*;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -15,10 +15,6 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.CountDownTimer;
-import android.os.Handler;
-import android.os.Message;
-import android.os.VibrationEffect;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -175,6 +171,9 @@ public class landing_page extends Fragment
                 if (!restricedPressed)
                 {
                     restricedPressed = true;
+                    //final Vibrator vib = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
+                  //  vib.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
+                    Toast.makeText(getContext(),"Launching Restricted Apps", Toast.LENGTH_LONG).show();
                     setRestrictedLaunchThread(waitTime, view);
                     restrictedLaunchThread.start();
                     Log.e("Restricted Launch Thread ", "Thraed Started");
