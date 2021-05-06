@@ -126,9 +126,9 @@ public class restricted_apps extends Fragment
                     final Random random = new Random();
                     int appLaunchWaitTime = random.nextInt(15000 - 10000) + 10000;
 
-                   // final Vibrator v = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
-                   // v.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
-                    Toast.makeText(getContext(),"Launching " + String.format(restrictedApps.get(position).getApplicationName()), Toast.LENGTH_LONG).show();
+                    final Vibrator v = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
+                    v.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
+                   // Toast.makeText(getContext(),"Launching " + String.format(restrictedApps.get(position).getApplicationName()), Toast.LENGTH_LONG).show();
                     setApplicationLaunchThread(appLaunchWaitTime, position);
                     restrictedAppLaunchThread.start();
                     Log.e("Restricted Application Launch Thread ", "Thraed Started");

@@ -171,9 +171,9 @@ public class landing_page extends Fragment
                 if (!restricedPressed)
                 {
                     restricedPressed = true;
-                    //final Vibrator vib = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
-                  //  vib.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
-                    Toast.makeText(getContext(),"Launching Restricted Apps", Toast.LENGTH_LONG).show();
+                  final Vibrator vib = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
+                   vib.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
+                  //  Toast.makeText(getContext(),"Launching Restricted Apps", Toast.LENGTH_LONG).show();
                     setRestrictedLaunchThread(waitTime, view);
                     restrictedLaunchThread.start();
                     Log.e("Restricted Launch Thread ", "Thraed Started");
