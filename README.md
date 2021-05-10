@@ -4,7 +4,7 @@ This Application is an Android launcher that meants to reduce your phone usage t
 - Allowing the user the set certain application as restricted 
 - the restricted applications are then placed in a restricted section and can only be launched by going to the restricted section 
 - each time the user opens a restricted app the process of launching the restricted app is delayed 
-- the wait time is reset after 2 hours of not using restricted applications
+- the applications resets the wait time after 2 hours of not using restricted applications
 
 # How to use 
 
