@@ -34,6 +34,8 @@ public class MainActivity extends AppCompatActivity
 
     static String timeRemainingString;
     static final String LAST_LAUNCHED = "lastLaunched";
+    static final String RESTRICTED_LAUNCHED = "restrictedLaunched";
+    static final String TIMES_LAUNCHED = "timesLaunched";
     static final String BACK_PRESSED = "backPressed";
     static final long CLOCK_RESET_TIME = 3600000 * 2;
      CountDownTimer timeRemaining;
@@ -92,8 +94,11 @@ public class MainActivity extends AppCompatActivity
         if (savedInstanceState != null) {
             // Restore value of members from saved state
             long lastLaunched = savedInstanceState.getLong(LAST_LAUNCHED);
+            long restrictedLaunched = savedInstanceState.getLong(RESTRICTED_LAUNCHED);
             fragmentLaunched = savedInstanceState.getInt(BACK_PRESSED);
             landing_page.setlastLaunchedTime( lastLaunched);
+            landing_page.setlastRestrictedLaunch(restrictedLaunched);
+            landing_page.setTimesLaunched(savedInstanceState.getInt(TIMES_LAUNCHED));
             Calendar timeTesting = Calendar.getInstance();
             if(timeTesting.getTimeInMillis() - lastLaunched < CLOCK_RESET_TIME)
             {
@@ -110,7 +115,9 @@ public class MainActivity extends AppCompatActivity
     public void onSaveInstanceState(Bundle savedInstanceState) {
         // Save the user's current game state
         savedInstanceState.putLong(LAST_LAUNCHED, landing_page.lastLaunchedTime );
+        savedInstanceState.putLong(RESTRICTED_LAUNCHED, landing_page.restrictedLaunched );
         savedInstanceState.putInt(BACK_PRESSED, fragmentLaunched );
+        savedInstanceState.putInt(TIMES_LAUNCHED, landing_page.timesLaunched );
 
 
         // Always call the superclass so it can save the view hierarchy state

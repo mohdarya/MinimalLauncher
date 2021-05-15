@@ -322,6 +322,14 @@ public class landing_page extends Fragment
     {
         lastLaunchedTime = lastLaunchedTimeToSet;
     }
+    static public void setlastRestrictedLaunch(long lastLaunchedTimeToSet)
+    {
+        restrictedLaunched = lastLaunchedTimeToSet;
+    }
+
+    static public void setTimesLaunched(int toSet){
+        timesLaunched = toSet;
+    }
 
 
 }
