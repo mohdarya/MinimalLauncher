@@ -14,6 +14,8 @@ This Application is an Android launcher that meants to reduce your phone usage t
     - the right square in that page adds the application to your home page
     - the left squere adds the application to the restricted section 
 
+# Known Issues
+-  notifications of a restricted application send the user to the home page when the user has non restricted applications open  
 # Images
 Home Page
 </br>
